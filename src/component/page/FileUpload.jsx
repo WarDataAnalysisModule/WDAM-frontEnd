@@ -1,11 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
-import PostList from '../list/PostList';
 import Button from '../ui/Button';
 import data from '../../data.json';
 import TextInput from '../ui/TextInput';
-import {FaRegCheckCircle, FaMoneyCheck} from 'react-icons/fa';
 import icon from '../../wdam.png'
 
 const Wrapper = styled.div`
