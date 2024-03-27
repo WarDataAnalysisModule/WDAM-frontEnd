@@ -65,8 +65,41 @@ align-items: center; // 세로 중앙
 cursor: pointer;
 `
 
+const LogButton = styled.button`
+    display: flex;
+    justify-content: center;
+    height: 50px;
+    width: 100%;
+    font-size: 12px;
+    align-items: center;
+    cursor: pointer;
+    background-color: ${(props)=>props.isSelected ? "#A0A0A0" : "#F0F0F0"};
+    font-color: white;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    &:hover {
+        background-color: #C0C0C0; /* 마우스 오버시 버튼의 배경색을 어둡게 변경합니다. */
+    }
+`
+const SquareButton = styled.button`
+background-color: #E0E7D4; // 버튼의 배경색
+color: black; // 텍스트 색상
+padding: 10px 20px; // 패딩
+border: none; // 테두리 제거
+border-radius: 4px; // 둥근 모서리
+font-size: 16px; // 글자 크기
+margin: 10px 0; // 마진으로 버튼 주변 공간 추가
+width: 1000px;
+height: 70px;
+transition: background-color 0.3s; // 배경색 변경시 애니메이션 효과
+text-align: left;
+
+
+`
+
 function Button(props) { // 모든 컴포넌트의 첫 글자가 대문자여야함 아니면 작동을 안함 (왜인지는 모르겠음)
-    const { key, type, title, onClick } = props;
+    const { isSelected, key, type, title, onClick } = props;
     if (type === "disabled") {
         return <DisabledButton></DisabledButton>
     }
@@ -78,6 +111,12 @@ function Button(props) { // 모든 컴포넌트의 첫 글자가 대문자여야
     }
     else if (type === "file") {
         return <FileButton key={key} onClick={onClick}>{title || "button"}</FileButton>
+    }
+    else if (type === "log") {
+        return <LogButton isSelected={isSelected} key={key} onClick={onClick}>{title || "button"}</LogButton>
+    }
+    else if (type === "square") {
+        return <SquareButton >{title || "button"}</SquareButton>
     }
     return <StyledButton onClick={onClick}>{title || "button"}</StyledButton>
 }

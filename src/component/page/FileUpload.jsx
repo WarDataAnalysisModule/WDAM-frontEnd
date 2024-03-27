@@ -126,7 +126,7 @@ function FileUpload(props) {
             const data = await response.json();
             if (response.ok) {
                 console.log('파일 업로드 성공:', data);
-                navigate('/upload'); // 추후 분석 페이지로 넘어갈 예정
+                navigate('/analysis'); // 추후 분석 페이지로 넘어갈 예정
             } else {
                 console.error('파일 업로드 실패:', data);
             }
@@ -169,7 +169,8 @@ function FileUpload(props) {
                     {renderFileButtons()}
                 </FileButtonContainer>
                 <StyledButtonContainer>
-                    <Button title="분석하기 →" onClick={submitFile}/>
+                    <Button title="분석하기 →" onClick={()=>navigate('/analysis')}/> 
+                    {/* /* onClick={submitFile} */}
                 </StyledButtonContainer>
                 
             </Container>

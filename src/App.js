@@ -11,6 +11,7 @@ import MainPage from './component/page/MainPage';
 import SignUpPage from './component/page/SignUpPage';
 import FileUpload from "./component/page/FileUpload";
 import MyPage from "./component/page/MyPage";
+import Analysis from "./component/page/Analysis";
 
 const MainTitleText = styled.p`
     font-size: 24px;
@@ -31,6 +32,7 @@ function App(props) {
                 <Route path="signup" element={<SignUpPage />} /> 
                 <Route path="fileupload" element={<FileUpload />} />
                 <Route path="MyPage" element={<MyPage />} />
+                <Route path="analysis" element={<Analysis />} />
             </Routes>
         </BrowserRouter>
     );
