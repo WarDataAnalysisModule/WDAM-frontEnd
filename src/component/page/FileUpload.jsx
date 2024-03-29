@@ -117,8 +117,8 @@ function FileUpload(props) {
             `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()} ${currentTime.getHours()}:${currentTime.getMinutes()}`);
             for (let i = 0; i < files.length; i++) {
                 formData.append('file', files[i], files[i].name);
-            }
-            const response = await fetch('http://localhost:8080/api/upload', {
+            }//http://localhost:8080/api/upload
+            const response = await fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', {
                 method: 'POST',
                 body: formData,
             });
@@ -169,7 +169,7 @@ function FileUpload(props) {
                     {renderFileButtons()}
                 </FileButtonContainer>
                 <StyledButtonContainer>
-                    <Button title="분석하기 →" onClick={()=>navigate('/analysis')}/> 
+                    <Button title="분석하기 →" onClick={()=>submitFile()}/> 
                     {/* /* onClick={submitFile} */}
                 </StyledButtonContainer>
                 
