@@ -54,7 +54,7 @@ justify-content: center; // 가로 중앙 text-align은 display:flex 없이도 �
 flex-wrap: wrap;
 gap: 10px; // 버튼 사이의 간격
 margin-top: 20px; // 버튼 상단 여백
-background-color: #D0D0D0;
+background-color: ${(props)=>props.isSelected ? "#A0A0A0" : "#D0D0D0"};
 border: 1px solid transparent;
 height: 50px;
 width: 150px;
@@ -122,7 +122,7 @@ function Button(props) { // 모든 컴포넌트의 첫 글자가 대문자여야
         return <TagButton onClick={onClick}>{title || "button"}</TagButton>
     }
     else if (type === "file") {
-        return <FileButton key={key} onClick={onClick}>{title || "button"}</FileButton>
+        return <FileButton isSelected={isSelected} key={key} onClick={onClick}>{title || "button"}</FileButton>
     }
     else if (type === "log") {
         return <LogButton isSelected={isSelected} key={key} onClick={onClick}>{title || "button"}</LogButton>

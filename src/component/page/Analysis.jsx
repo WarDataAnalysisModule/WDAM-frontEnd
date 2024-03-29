@@ -40,6 +40,17 @@ margin-left: 220px;
 padding-left: 20px;
 `
 
+const Feature = [
+    "부대 이동 속도 / 위치 변화",
+    "인원/장비 수량 변화",
+    "개체 탐지",
+    "부대의 전투력",
+    "부대의 행동",
+    "부대의 피해 상황",
+    "부대 정보",
+    "부대 상태 및 지원"
+]
+
 const ExplainFeature = [
     "부대 이동 속도 / 위치 변화 설명",
     "인원/장비 수량 변화 설명",
@@ -55,15 +66,16 @@ function Analysis(props) {
     const navigate = useNavigate();
     const [logTime, setLogTime] = useState([]); // 추후에 이 변수를 api로 계속 업데이트
     const [selectedLog, setSelectedLog] = useState(-1);
-    let currentTime = new Date(); // using test
-    const [simulTime, setSimulTime] = useState(''); // using test
     const [chooseExplain, setChooseExplain] = useState(-1);
     const [showExplain, setShowExplain] = useState(true);
+    const [selectedFeature, setSelectedFeature] = useState(-1);
+
+    let currentTime = new Date(); // using test 나중에 api 되면 변경 예정
+    const [simulTime, setSimulTime] = useState(''); // using test 나중에 api 되면 변경 예정
 
     const renderContent = () => {
         return (
             <Button title="파일 업로드로" onClick={()=>navigate('/fileupload')} />
-
         );
     }
 
@@ -75,6 +87,13 @@ function Analysis(props) {
             <Button type="log" isSelected={selectedLog === index} title={log} key={index} onClick={()=>
             {setSelectedLog(index)
             setSimulTime(log)}} /> // using test
+        ));
+    }
+    const ExplainList = () => {
+        return Feature.map((feat, index) => (
+            <Button type="file" isSelected={selectedFeature === index} title={Feature[index]} key={index}
+            onClick={()=>{setChooseExplain(index)
+            setSelectedFeature(index)}} />
         ));
     }
 
@@ -107,30 +126,14 @@ function Analysis(props) {
         <div style={{overflowY: "auto"}}>
         <p style={{marginLeft: '240px', marginTop: '120px'}}>분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요.</p>
         <PropContainer>
-            <Button type="file" title="부대 이동 속도 / 위치 변화"
-            onClick={()=>setChooseExplain(0)}/>
-            <Button type="file" title="인원/장비 수량 변화"
-            onClick={()=>setChooseExplain(1)}/>
-            <Button type="file" title="개체 탐지"
-            onClick={()=>setChooseExplain(2)}/>
-            <Button type="file" title="부대의 전투력"
-            onClick={()=>setChooseExplain(3)}/>
-            <Button type="file" title="부대의 행동"
-            onClick={()=>setChooseExplain(4)}/>
-            <Button type="file" title="부대의 피해 상황"
-            onClick={()=>setChooseExplain(5)}/>
-            <Button type="file" title="부대 정보"
-            onClick={()=>setChooseExplain(6)}/>
-            <Button type="file" title="부대 상태 및 지원"
-            onClick={()=>setChooseExplain(7)}/>
+            {ExplainList()}
         </PropContainer>
         <TextBox 
         showExplain={showExplain}
         setShowExplain={setShowExplain}
         text={chooseExplain >= 0 ? ExplainFeature[chooseExplain] : ""}
         />
-
-        </div>  
+        </div>
     </div>
     );
 }

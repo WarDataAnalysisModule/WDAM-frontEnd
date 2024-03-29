@@ -109,6 +109,7 @@ function FileUpload(props) {
     const submitFile = async() => {
         try {
             if (files.length === 0) {
+                navigate('/analysis')
                 return;
             }
             const formData = new FormData();
