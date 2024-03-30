@@ -23,7 +23,7 @@ const Container = styled.div`
     display: flex;
     margin-left: 220px;
     margin-top: 20px;
-    position: fixed;
+    position: absolute;
     //position: relative;
     
     padding-left: 20px;
@@ -31,13 +31,13 @@ const Container = styled.div`
 `
 
 const PropContainer = styled.div`
-display: flex;
-justify-content: left;
-flex-wrap: wrap;
-gap: 10px; // 버튼 사이의 간격
-margin-top: 20px; // 버튼 상단 여백
-margin-left: 220px;
-padding-left: 20px;
+    display: flex;
+    justify-content: left;
+    flex-wrap: wrap;
+    gap: 10px; // 버튼 사이의 간격
+    margin-top: 20px; // 버튼 상단 여백
+    margin-left: 220px;
+    padding-left: 20px;
 `
 
 const Feature = [
@@ -61,6 +61,28 @@ const ExplainFeature = [
     "부대 정보 설명",
     "부대 상태 및 지원 설명"
 ]
+
+const TestObject = [
+    "A-1-1중대",
+    "A-1-2중대",
+    "A-2-1중대",
+    "A-2-2중대",
+]
+
+const ObjectContainer = styled.div`
+margin-left: 240px;
+margin-bottom: 200px;
+padding: 20px;
+//margin: 20px;
+border: 1px solid #ccc;
+border-radius: 4px;
+background-color: #f8f8f8;
+color: #333;
+font-size: 16px;
+//margin-left: 240px;
+//margin-top: 20px;
+width: calc(50% - 320px);
+`
 
 function Analysis(props) {
     const navigate = useNavigate();
@@ -95,6 +117,11 @@ function Analysis(props) {
             onClick={()=>{setChooseExplain(index)
             setSelectedFeature(index)}} />
         ));
+    }
+    const renderObject = () => {
+        return TestObject.map((obj, index) => (
+            <Button type="file" title={TestObject[index]} key={index}/>
+        ))
     }
 
 
@@ -133,7 +160,12 @@ function Analysis(props) {
         setShowExplain={setShowExplain}
         text={chooseExplain >= 0 ? ExplainFeature[chooseExplain] : ""}
         />
+        <p style={{marginLeft: '240px', marginTop: '120px'}}>분석대상을 선택해주세요.</p>
+        <ObjectContainer>
+            {renderObject()}
+        </ObjectContainer>
         </div>
+        <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
     </div>
     );
 }
