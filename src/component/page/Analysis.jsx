@@ -94,10 +94,14 @@ const Container3 = styled.div`
 function Analysis(props) {
     const navigate = useNavigate();
     const [logTime, setLogTime] = useState([]); // 추후에 이 변수를 api로 계속 업데이트
-    const [selectedLog, setSelectedLog] = useState(-1);
-    const [chooseExplain, setChooseExplain] = useState(-1);
+    const [analysisResult, setAnalysisResult] = useState([]);
+    
     const [showExplain, setShowExplain] = useState(true);
+
+    const [chooseExplain, setChooseExplain] = useState(-1);
+    const [selectedLog, setSelectedLog] = useState(-1);
     const [selectedFeature, setSelectedFeature] = useState(-1);
+    const [selectedArmyUnit, setSelectedArmyUnit] = useState(-1);
 
     let currentTime = new Date(); // using test 나중에 api 되면 변경 예정
     const [simulTime, setSimulTime] = useState(''); // using test 나중에 api 되면 변경 예정
@@ -108,9 +112,18 @@ function Analysis(props) {
         );
     }
 
+    const renderObject = () => {
+        return TestObject.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
+            <Button type="armyunit" isSelected={selectedArmyUnit === index} title={TestObject[index]} 
+            key={index} onClick={()=>{setSelectedArmyUnit(index)}}/>
+        ))
+    }
+
     useEffect(() => {
         if (!localStorage.getItem('userId')) navigate('/');
     }, [navigate])
+
+
     const LogList = () => {
         return logTime.map((log, index) => (
             <Button type="log" isSelected={selectedLog === index} title={log} key={index} onClick={()=>
@@ -125,10 +138,50 @@ function Analysis(props) {
             setSelectedFeature(index)}} />
         ));
     }
-    const renderObject = () => {
-        return TestObject.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
-            <Button type="armyunit" title={TestObject[index]} key={index}/>
-        ))
+
+    const submitAnalysis = async() => {
+        try {
+            if (selectedLog === -1 || selectedFeature === -1 || selectedArmyUnit === -1) {
+                alert("시뮬레이션 날짜, 분석 특성, 분석 대상을 확인해주세요.")
+                return;
+            }
+            const response = await fetch('http://localhost:8080/api/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    trait: Feature[selectedFeature],
+                    unit: TestObject[selectedArmyUnit],
+                    // logtime: logTime[selectedLog]
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                const response2 = await fetch('http://localhost:8080/api/analyze/result', {
+                method: 'GET',
+                headers: {
+                    'Accept' : 'application/json', 
+                }
+                });
+
+                if (response2.ok) {
+                    const analysisData = await response2.json();
+                    setAnalysisResult(...analysisResult, analysisData);
+                }
+                else {
+                    console.error('분석 결과 가져오기 실패');
+                }
+            }
+            else {
+                console.error('분석 업로드 실패:', data);
+            }
+        }
+        catch (error) {
+            console.error('서버 에러:', error);
+        }
     }
 
 
@@ -171,9 +224,19 @@ function Analysis(props) {
         <ObjectContainer>
             {renderObject()}
         </ObjectContainer>
-        <Container3><Button title={"분석하기"}></Button></Container3>
+        <p style={{marginLeft: '240px'}}>{`${logTime[selectedLog]}
+         ${Feature[selectedFeature]} ${TestObject[selectedArmyUnit]}`}</p>
+        {/* 테스트용 문구 (api 연결 시 지워야함) */}
+        <Container3><Button title={"분석하기"} onClick={submitAnalysis}></Button></Container3>
         
         <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
+        {/*밑의 TextBox에 모듈의 분석 결과를 출력해줌. 그리고 그에 맞는 분석 특성과 대상을 같이 보여줘야함. */}
+        <TextBox
+        title={Feature[selectedFeature]}
+        showExplain={showExplain}
+        setShowExplain={setShowExplain}
+        text={chooseExplain >= 0 ? ExplainFeature[chooseExplain] : ""}
+        />
         
         </div>
     </div>

@@ -111,7 +111,7 @@ font-weight: bold;
 `
 
 const ArmyUnitButton = styled.button`
-background: transparent; /* 배경을 투명하게 설정 */
+background-color: ${(props)=>props.isSelected ? "#C0C0C0" : "transparent"}; /* 배경을 투명하게 설정 */
 border: 1px solid transparent; /* 테두리를 투명하게 설정 */
 color: black; /* 버튼 내의 글자색을 검정색으로 설정, 색상은 원하는 대로 변경 가능 */
 padding: 10px 20px; /* 버튼 내부의 패딩을 조정 */

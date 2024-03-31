@@ -16,13 +16,13 @@ const Box = styled.div`
   width: calc(100% - 320px);
 `;
 
-const TextBox = ({ text, showExplain, setShowExplain }) => {
+const TextBox = ({ title, text, showExplain, setShowExplain }) => {
     const toggleVisibility = () => {
         setShowExplain(!showExplain);
     }
   return (
   <div style={{marginLeft: "240px"}}>
-    <Button type="explain" title="설명" onClick={toggleVisibility}></Button>
+    <Button type="explain" title={title || "설명"} onClick={toggleVisibility}></Button>
     {showExplain && <Box>{text}</Box>}
   </div>
   );
