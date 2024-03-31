@@ -110,6 +110,20 @@ text-align: center; /* 텍스트를 가운데 정렬 */
 font-weight: bold;
 `
 
+const ArmyUnitButton = styled.button`
+background: transparent; /* 배경을 투명하게 설정 */
+border: 1px solid transparent; /* 테두리를 투명하게 설정 */
+color: black; /* 버튼 내의 글자색을 검정색으로 설정, 색상은 원하는 대로 변경 가능 */
+padding: 10px 20px; /* 버튼 내부의 패딩을 조정 */
+font-size: 14px; /* 글자 크기를 설정 */
+cursor: pointer; /* 마우스 오버 시 커서를 변경 */
+text-align: center; /* 텍스트를 가운데 정렬 */
+display: flex;
+//margin: auto; /* 자동으로 마진을 주어 수평 중앙 정렬 */
+justify-content: center;
+gap: 10px;
+`
+
 function Button(props) { // 모든 컴포넌트의 첫 글자가 대문자여야함 아니면 작동을 안함 (왜인지는 모르겠음)
     const { isSelected, key, type, title, onClick } = props;
     if (type === "disabled") {
@@ -132,6 +146,9 @@ function Button(props) { // 모든 컴포넌트의 첫 글자가 대문자여야
     }
     else if (type === "explain") {
         return <ExplainButton onClick={onClick}>{title || "button"}</ExplainButton>
+    }
+    else if (type === "armyunit") {
+        return <ArmyUnitButton isSelected={isSelected} key={key} onClick={onClick}>{title || "button"}</ArmyUnitButton>
     }
     return <StyledButton onClick={onClick}>{title || "button"}</StyledButton>
 }

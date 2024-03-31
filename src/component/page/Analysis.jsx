@@ -62,11 +62,12 @@ const ExplainFeature = [
     "부대 상태 및 지원 설명"
 ]
 
-const TestObject = [
+const TestObject = [ // api로 받아오는 걸로 바꿀 예정
     "A-1-1중대",
     "A-1-2중대",
     "A-2-1중대",
     "A-2-2중대",
+    "B-1-1중대"
 ]
 
 const ObjectContainer = styled.div`
@@ -82,6 +83,12 @@ font-size: 16px;
 //margin-left: 240px;
 //margin-top: 20px;
 width: calc(50% - 320px);
+`
+
+const Container3 = styled.div`
+    margin-left: 240px;
+    margin-top: -150px;
+    margin-bottom: 100px;
 `
 
 function Analysis(props) {
@@ -119,8 +126,8 @@ function Analysis(props) {
         ));
     }
     const renderObject = () => {
-        return TestObject.map((obj, index) => (
-            <Button type="file" title={TestObject[index]} key={index}/>
+        return TestObject.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
+            <Button type="armyunit" title={TestObject[index]} key={index}/>
         ))
     }
 
@@ -164,8 +171,11 @@ function Analysis(props) {
         <ObjectContainer>
             {renderObject()}
         </ObjectContainer>
-        </div>
+        <Container3><Button title={"분석하기"}></Button></Container3>
+        
         <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
+        
+        </div>
     </div>
     );
 }
