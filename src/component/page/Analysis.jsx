@@ -52,14 +52,14 @@ const Feature = [
 ]
 
 const ExplainFeature = [
-    "부대 이동 속도 / 위치 변화 설명",
-    "인원/장비 수량 변화 설명",
-    "개체 탐지 설명",
-    "부대의 전투력 설명",
-    "부대의 행동 설명",
-    "부대의 피해 상황 설명",
-    "부대 정보 설명",
-    "부대 상태 및 지원 설명"
+    "- 부대 이동 속도 / 위치 변화 : 출발지, 목적지 위치까지의 거리와 걸린 시간을 이용하여 속도를 계산한다.",
+    "- 인원 / 장비 수량 변화 : 사격 이벤트 발생 후 분석 대상의 인원 / 장비 수량을 비율로 비교한다.",
+    "- 개체 탐지 : 분석 대상이 감지한 적이 감지된 시점, 거리, 피해량 등을 분석한다.",
+    "- 부대의 전투력 : 분석 대상의 피해상태, 화력을 분석한다.",
+    "- 부대의 행동 : 분석 대상이 행하고 있는 동작을 출력한다.",
+    "- 부대의 피해 상황 : 분석 대상의 인원, 장비 수량 변화와 피해 상태, 화력을 분석한다.",
+    "- 부대 정보 : 모든 부대의 이름, 상태, 구성인원, 장비, 무기를 이름별로 출력한다.",
+    "- 부대 상태 및 지원 : 피해 상태가 Moderate Damaged인 모든 부대의 시뮬레이션 시간, 부대 이름, 화력을 분석한다."
 ]
 
 const TestObject = [ // api로 받아오는 걸로 바꿀 예정
@@ -96,7 +96,7 @@ function Analysis(props) {
     const [logTime, setLogTime] = useState([]); // 추후에 이 변수를 api로 계속 업데이트
     const [analysisResult, setAnalysisResult] = useState([]);
     
-    const [showExplain, setShowExplain] = useState(true);
+    const [showExplain, setShowExplain] = useState(false);
 
     const [chooseExplain, setChooseExplain] = useState(-1);
     const [selectedLog, setSelectedLog] = useState(-1);
@@ -218,7 +218,7 @@ function Analysis(props) {
         <TextBox 
         showExplain={showExplain}
         setShowExplain={setShowExplain}
-        text={chooseExplain >= 0 ? ExplainFeature[chooseExplain] : ""}
+        text={ExplainFeature}
         />
         <p style={{marginLeft: '240px', marginTop: '120px'}}>분석대상을 선택해주세요.</p>
         <ObjectContainer>
@@ -231,12 +231,12 @@ function Analysis(props) {
         
         <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
         {/*밑의 TextBox에 모듈의 분석 결과를 출력해줌. 그리고 그에 맞는 분석 특성과 대상을 같이 보여줘야함. */}
-        <TextBox
+        {/* <TextBox
         title={Feature[selectedFeature]}
         showExplain={showExplain}
         setShowExplain={setShowExplain}
         text={chooseExplain >= 0 ? ExplainFeature[chooseExplain] : ""}
-        />
+        /> */}
         
         </div>
     </div>
