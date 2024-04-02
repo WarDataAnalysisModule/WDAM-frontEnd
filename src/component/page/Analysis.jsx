@@ -96,6 +96,8 @@ function Analysis(props) {
     const [logTime, setLogTime] = useState([]); // 추후에 이 변수를 api로 계속 업데이트
     const [analysisResult, setAnalysisResult] = useState([]);
     
+    const [showSelected, setShowSelected] = useState(true);
+    const selectedTitle = showSelected ? "▼ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요." : "▶ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요.";
     const [showExplain, setShowExplain] = useState(false);
 
     const [chooseExplain, setChooseExplain] = useState(-1);
@@ -105,6 +107,11 @@ function Analysis(props) {
 
     let currentTime = new Date(); // using test 나중에 api 되면 변경 예정
     const [simulTime, setSimulTime] = useState(''); // using test 나중에 api 되면 변경 예정
+
+
+    const handleSelectedClick = () => {
+        setShowSelected(!showSelected);
+    }
 
     const renderContent = () => {
         return (
@@ -211,23 +218,29 @@ function Analysis(props) {
             {/* api로 시간 가져와야함 */}
         </Container>
         <div style={{overflowY: "auto"}}>
-        <p style={{marginLeft: '240px', marginTop: '120px'}}>분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요.</p>
-        <PropContainer>
-            {ExplainList()}
-        </PropContainer>
-        <TextBox 
-        showExplain={showExplain}
-        setShowExplain={setShowExplain}
-        text={ExplainFeature}
-        />
-        <p style={{marginLeft: '240px', marginTop: '120px'}}>분석대상을 선택해주세요.</p>
-        <ObjectContainer>
-            {renderObject()}
-        </ObjectContainer>
+        
+        <p style={{marginLeft: '240px', marginTop: '120px', cursor: 'pointer'}} onClick={handleSelectedClick}>{selectedTitle}</p>
+        {showSelected && (
+            <>
+                <PropContainer>
+                    {ExplainList()}
+                </PropContainer>
+                <TextBox 
+                showExplain={showExplain}
+                setShowExplain={setShowExplain}
+                text={ExplainFeature}
+                />
+                <p style={{marginLeft: '240px', marginTop: '120px'}}>분석대상을 선택해주세요.</p>
+                <ObjectContainer>
+                    {renderObject()}
+                </ObjectContainer>
+                <Container3><Button title={"분석하기"} onClick={submitAnalysis}></Button></Container3>
+            </>
+        )}
+        
         <p style={{marginLeft: '240px'}}>{`${logTime[selectedLog]}
          ${Feature[selectedFeature]} ${TestObject[selectedArmyUnit]}`}</p>
         {/* 테스트용 문구 (api 연결 시 지워야함) */}
-        <Container3><Button title={"분석하기"} onClick={submitAnalysis}></Button></Container3>
         
         <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
         {/*밑의 TextBox에 모듈의 분석 결과를 출력해줌. 그리고 그에 맞는 분석 특성과 대상을 같이 보여줘야함. */}
