@@ -67,7 +67,7 @@ const TestObject = [ // api로 받아오는 걸로 바꿀 예정
     "A-1-2중대",
     "A-2-1중대",
     "A-2-2중대",
-    "B-1-1중대"
+    "B-1-1중대",
 ]
 
 const ObjectContainer = styled.div`
@@ -92,6 +92,8 @@ const Container3 = styled.div`
 `
 
 function Analysis(props) {
+    let Allunit = false; // 모든 부대를 대상으로 하는지 안하는지 확인
+    // useState를 통해서 다른 요소가 바뀌면 재렌더링될때마다 false로 값이 바뀜
     const navigate = useNavigate();
     const [logTime, setLogTime] = useState([]); // 추후에 이 변수를 api로 계속 업데이트
     const [analysisResult, setAnalysisResult] = useState([]);
@@ -120,6 +122,10 @@ function Analysis(props) {
     }
 
     const renderObject = () => {
+        if (selectedFeature === 6 || selectedFeature === 7) {
+            Allunit = true;
+            return <p style={{fontWeight: "bold"}}>모든 부대를 대상으로 하는 특성입니다.</p>
+        }
         return TestObject.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
             <Button type="armyunit" isSelected={selectedArmyUnit === index} title={TestObject[index]} 
             key={index} onClick={()=>{setSelectedArmyUnit(index)}}/>
@@ -128,7 +134,10 @@ function Analysis(props) {
 
     useEffect(() => {
         if (!localStorage.getItem('userId')) navigate('/');
-    }, [navigate])
+        if (selectedFeature === 6 || selectedFeature === 7) {
+            
+        }
+    }, [navigate, selectedFeature])
 
 
     const LogList = () => {
@@ -239,7 +248,7 @@ function Analysis(props) {
         )}
         
         <p style={{marginLeft: '240px'}}>{`${logTime[selectedLog]}
-         ${Feature[selectedFeature]} ${TestObject[selectedArmyUnit]}`}</p>
+         ${Feature[selectedFeature]} ${Allunit ? 'All' : TestObject[selectedArmyUnit]}`}</p>
         {/* 테스트용 문구 (api 연결 시 지워야함) */}
         
         <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>

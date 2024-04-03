@@ -20,7 +20,7 @@ const TextBox = ({ text, showExplain, setShowExplain }) => {
   const toggleVisibility = () => {
       setShowExplain(!showExplain);
   }
-  const title = showExplain ? "▼설명" : "▶설명";
+  const title = showExplain ? "▼ 설명" : "▶ 설명";
   return (
   <div style={{marginLeft: "240px"}}>
     <Button type="explain" title={title} onClick={toggleVisibility}></Button>
