@@ -4,7 +4,8 @@ import styled from 'styled-components';
 import Button from '../ui/Button';
 import data from '../../data.json';
 import TextInput from '../ui/TextInput';
-import icon from '../../wdam.png'
+import icon from '../../wdam.png';
+import Loading from '../content/Loading';
 
 const Wrapper = styled.div`
     padding: 16px;
@@ -73,6 +74,7 @@ function FileUpload(props) {
         fileRef.current.click();
     };
     const [files,setFiles] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const renderFileButtons = () => {
         return files.map((file, index) => (
@@ -107,6 +109,7 @@ function FileUpload(props) {
 
     // 데이터베이스로 파일 전송해주는 기능
     const submitFile = async() => {
+        setLoading(true);
         try {
             if (files.length === 0) {
                 navigate('/analysis')
@@ -126,10 +129,14 @@ function FileUpload(props) {
 
             const data = await response.json();
             if (response.ok) {
+                localStorage.setItem('unitList', data.unitName); // 추후에 이름을 바꿔야 될 수도 있음
+                localStorage.setItem('unitIdx', data.listIdx);
                 console.log('파일 업로드 성공:', data);
-                navigate('/analysis'); // 추후 분석 페이지로 넘어갈 예정
+                setLoading(false);
+                navigate('/analysis');
             } else {
                 console.error('파일 업로드 실패:', data);
+                setLoading(false);
             }
         }
         catch (error) {
@@ -139,6 +146,7 @@ function FileUpload(props) {
 
     return (
         <div>
+            {loading ? <Loading></Loading> : null}
             <ButtonContainer>
                 <Button type="tag" title="로그아웃" onClick={()=> {
                     localStorage.setItem('userId', '');
