@@ -101,6 +101,7 @@ function Analysis(props) {
     const [showSelected, setShowSelected] = useState(true);
     const selectedTitle = showSelected ? "▼ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요." : "▶ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요.";
     const [showExplain, setShowExplain] = useState(false);
+    const explainTitle = showExplain ? "▼ 설명" : "▶ 설명";
 
     const [chooseExplain, setChooseExplain] = useState(-1);
     const [selectedLog, setSelectedLog] = useState(-1);
@@ -234,7 +235,8 @@ function Analysis(props) {
                 <PropContainer>
                     {ExplainList()}
                 </PropContainer>
-                <TextBox 
+                <TextBox
+                title={explainTitle}
                 showExplain={showExplain}
                 setShowExplain={setShowExplain}
                 text={ExplainFeature}
