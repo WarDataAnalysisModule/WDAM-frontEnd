@@ -227,7 +227,7 @@ function Analysis(props) {
                 });
 
                 if (response2.ok) {
-                    const analysisData = await response2.json();
+                    const analysisData = await response2.json().data;
                     setAnalysisResult(analysisData);
                 }
                 else {
