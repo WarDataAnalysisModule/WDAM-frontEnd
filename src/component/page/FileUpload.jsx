@@ -127,7 +127,7 @@ function FileUpload(props) {
     }
 
     useEffect(() => {
-        if (!localStorage.getItem('userId')) navigate('/');
+        if (!localStorage.getItem('headerData')) navigate('/');
         if (files.length > 0) classifyFiles();
     }, [navigate, files])
 
@@ -162,7 +162,7 @@ function FileUpload(props) {
             // Append the current timestamp
             
             // Single fetch request
-            const response = await fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', {
+            const response = await fetch('http://localhost:3306/files', {
                 method: 'POST',
                 body: formData
             });
@@ -182,14 +182,49 @@ function FileUpload(props) {
         }
     }
 
+    const logout = async() => {
+        try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+            const response = await fetch('http://localhost:8080/users/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headerData
+                },
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                })
+            });
+            console.log(response);
+            const responseData = await response.json();
+            
+            // 서버 응답에 따른 처리
+            if (response.ok && responseData.code === "1000") {
+                localStorage.setItem('headerData', '');
+                localStorage.setItem('accessToken', '');
+                localStorage.setItem('refreshToken', '');
+                alert("로그아웃 되었습니다.");
+                navigate('/');
+            } else {
+                // 로그아웃 실패
+                alert("로그아웃 실패");
+            }
+        }
+        catch (error) {
+            console.error('서버 에러:', error);
+            alert("로그아웃 실패");
+        }
+    }
+
     return (
         <div>
             {loading ? <Loading></Loading> : null}
             <ButtonContainer>
-                <Button type="tag" title="로그아웃" onClick={()=> {
-                    localStorage.setItem('userId', '');
-                    navigate('/');
-                }}/>
+                <Button type="tag" title="로그아웃" onClick={logout}/>
                 <p style={{fontSize: "15px", color: '#808080', marginLeft: '-12px', marginRight: '-12px'}}>|</p>
                 <Button type="tag" title={"마이페이지"} onClick={()=> {
                     navigate('/mypage');
