@@ -131,7 +131,7 @@ function Analysis(props) {
             return <p style={{fontWeight: "bold"}}>모든 부대를 대상으로 하는 특성입니다.</p>
         }
         return unitList.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
-            <Button type="armyunit" isSelected={selectedArmyUnit === index} title={unitList[index]} 
+            <Button type="armyunit" isSelected={selectedArmyUnit === index} title={unitList.unitName[index]} 
             key={index} onClick={()=>{setSelectedArmyUnit(index)}}/>
         ))
     }
@@ -170,7 +170,7 @@ function Analysis(props) {
             });
             const data = await response.json();
             if (response.ok) {
-                setUnitList(data);
+                setUnitList(data.data.unitList);
             }
             else {
                 console.error('에러');
