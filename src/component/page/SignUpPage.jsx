@@ -63,38 +63,12 @@ function SignUpPage(props) {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [nickname, setName] = useState('');
+    const [confirmPwd, setConfirmPwd] = useState('');
     const [username, setId] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const passwordCheck = password === nickname;
+    const passwordCheck = password === confirmPwd;
     const [pwVb, setPwVb] = useState(false);
 
-    const requestAuthCode = async() => {
-        try {
-            const response = await fetch('http://13.125.129.92:8080/authnum/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: email
-                })
-            });
-            
-            const data = await response.json();
-            if (response.ok) {
-                // 회원가입 성공
-                console.log('회원가입 성공:', data);
-                navigate('/');  // 회원가입 성공 후 리디렉션
-            } else {
-                // 회원가입 실패
-                console.error('회원가입 실패:', data);
-            }
-        } catch (error) {
-            console.error('서버 에러:', error);
-        }
-    }
-    // 병준이 db 주소 : http://13.125.129.92:8080/user/signup
     const handleSubmit = async() => {
         try {
             if (!passwordCheck) {
@@ -104,7 +78,7 @@ function SignUpPage(props) {
                 alert("정보를 정확하게 입력해주세요.")
             }
             else {
-                const response = await fetch('http://localhost:8080/api/user', {
+                const response = await fetch('http://localhost:8080/users/signup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -118,16 +92,17 @@ function SignUpPage(props) {
                 });
                 console.log(response);
 
-                const data = await response.json();
+                const responseData = await response.json();
 
                 // 서버 응답에 따른 처리
-                if (response.ok) {
+                if (response.ok && responseData.code === "1000") {
                     // 회원가입 성공
-                    console.log('회원가입 성공:', data);
+                    console.log('회원가입 성공:', responseData);
                     navigate('/');  // 회원가입 성공 후 리디렉션
                 } else {
                     // 회원가입 실패
-                    console.error('회원가입 실패:', data);
+                    console.error('회원가입 실패:', responseData);
+                    alert("아이디 또는 이메일이 중복되었습니다.");
                 }
             }
         } catch (error) {
@@ -164,10 +139,10 @@ function SignUpPage(props) {
                 />
                 <TextInput 
                     height={60}
-                    value={nickname}
-                    type={pwVb ? "text" : "password"}
+                    value={confirmPwd}
+                    type={"password"}
                     onChange={(event) => {  // 여기를 camelCase로 변경
-                        setName(event.target.value);
+                        setConfirmPwd(event.target.value);
                     }}
                     placeHolder="비밀번호 확인"  // 여기를 소문자로 변경
                     icon="password"
@@ -208,14 +183,6 @@ function SignUpPage(props) {
                 <Button
                     title='회원가입'
                     onClick={handleSubmit}
-                />
-                </StyledButtonContainer>
-                <br></br>
-                <StyledButtonContainer>
-                <Button
-                    type="disabled"
-                    title='인증번호 요청'
-                    onClick={requestAuthCode}
                 />
                 </StyledButtonContainer>
             </Container>
