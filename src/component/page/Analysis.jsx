@@ -149,7 +149,7 @@ function Analysis(props) {
     }
 
     useEffect(() => {
-        if (!localStorage.getItem('userId')) navigate('/');
+        if (!localStorage.getItem('headerData')) navigate('/');
         if (selectedFeature === 6 || selectedFeature === 7) {
             
         }
@@ -244,6 +244,44 @@ function Analysis(props) {
     }
 
 
+    const logout = async() => {
+        try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+            const response = await fetch('http://localhost:8080/users/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headerData
+                },
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                })
+            });
+            console.log(response);
+            const responseData = await response.json();
+            
+            // 서버 응답에 따른 처리
+            if (response.ok && responseData.code === "1000") {
+                localStorage.setItem('headerData', '');
+                localStorage.setItem('accessToken', '');
+                localStorage.setItem('refreshToken', '');
+                alert("로그아웃 되었습니다.");
+                navigate('/');
+            } else {
+                // 로그아웃 실패
+                alert("로그아웃 실패");
+            }
+        }
+        catch (error) {
+            console.error('서버 에러:', error);
+            alert("로그아웃 실패");
+        }
+    }
+
     return (
     <div>
         <div style={{position: "fixed", width: "200px", height: "100%", 
@@ -252,10 +290,7 @@ function Analysis(props) {
         marginBottom: "20px"}}>분석 로그</div><Log />{LogList()}</div>
         <ButtonContainer>
             <ButtonContainer2>{renderContent()}</ButtonContainer2>
-            <Button type="tag" title="로그아웃" onClick={()=> {
-                localStorage.setItem('userId', '');
-                navigate('/');
-            }}/>
+            <Button type="tag" title="로그아웃" onClick={logout}/>
             <p style={{fontSize: "15px", color: '#808080', marginLeft: '-12px', marginRight: '-12px'}}>|</p>
             <Button type="tag" title={"마이페이지"} onClick={()=> {
                 navigate('/mypage');
