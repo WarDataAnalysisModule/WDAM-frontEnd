@@ -150,65 +150,96 @@ function FileUpload(props) {
     const submitFile = async() => {
         setLoading(true);
         try {
-            // if (files.length === 0) {
-            //     navigate('/analysis')
-            //     return;
-            // }
-            const formDataArrays = {
-                unitInitFiles: new FormData(),
-                eventFiles: new FormData(),
-                behaviorFiles: new FormData(),
-                unitAttributeFiles: new FormData(),
-                superiorAttributeFiles: new FormData()
-            }
-            //const formData = new FormData();
-            let currentTime = new Date();
-            unitInitFiles.forEach(file => formDataArrays.unitInitFiles.append('init', file, file.name));
-            eventFiles.forEach(file => formDataArrays.eventFiles.append('event', file, file.name));
-            behaviorFiles.forEach(file => formDataArrays.behaviorFiles.append('behavior', file, file.name));
-            unitAttributeFiles.forEach(file => formDataArrays.unitAttributeFiles.append('unit', file, file.name));
-            superiorAttributeFiles.forEach(file => formDataArrays.superiorAttributeFiles.append('upper', file, file.name));
-            Object.values(formDataArrays).forEach(formData => {
-                formData.append('uploadTime',
-                `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()} ${currentTime.getHours()}:${currentTime.getMinutes()}`);
-            });
-            const uploadPromises = [
-                fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.unitInitFiles }),
-                fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.eventFiles }),
-                fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.behaviorFiles }),
-                fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.unitAttributeFiles }),
-                fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.superiorAttributeFiles })
-            ];
-            const responses = await Promise.all(uploadPromises);
-            responses.forEach(async response => {
-                const data = await response.json();
-                if (response.ok) {
-                    console.log('파일 업로드 성공:', data);
-                } else {
-                    console.error('파일 업로드 실패:', data);
-                }
-            });
-            // const response = await fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', {
-            //     method: 'POST',
-            //     body: formData,
-            // });
+        //     // if (files.length === 0) {
+        //     //     navigate('/analysis')
+        //     //     return;
+        //     // }
+        //     const formDataArrays = {
+        //         unitInitFiles: new FormData(),
+        //         eventFiles: new FormData(),
+        //         behaviorFiles: new FormData(),
+        //         unitAttributeFiles: new FormData(),
+        //         superiorAttributeFiles: new FormData()
+        //     }
+        //     //const formData = new FormData();
+        //     let currentTime = new Date();
+        //     unitInitFiles.forEach(file => formDataArrays.unitInitFiles.append('init', file, file.name));
+        //     eventFiles.forEach(file => formDataArrays.eventFiles.append('event', file, file.name));
+        //     behaviorFiles.forEach(file => formDataArrays.behaviorFiles.append('behavior', file, file.name));
+        //     unitAttributeFiles.forEach(file => formDataArrays.unitAttributeFiles.append('unit', file, file.name));
+        //     superiorAttributeFiles.forEach(file => formDataArrays.superiorAttributeFiles.append('upper', file, file.name));
+        //     Object.values(formDataArrays).forEach(formData => {
+        //         formData.append('uploadTime',
+        //         `${currentTime.getFullYear()}-${currentTime.getMonth()+1}-${currentTime.getDate()}T${currentTime.getHours()}:${currentTime.getMinutes()}`);
+        //     });
+        //     const uploadPromises = [
+        //         fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.unitInitFiles }),
+        //         fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.eventFiles }),
+        //         fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.behaviorFiles }),
+        //         fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.unitAttributeFiles }),
+        //         fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', { method: 'POST', body: formDataArrays.superiorAttributeFiles })
+        //     ];
+        //     const responses = await Promise.all(uploadPromises);
+        //     responses.forEach(async response => {
+        //         const data = await response.json();
+        //         if (response.ok) {
+        //             //localStorage.setItem('logCreated', )
+        //             console.log('파일 업로드 성공:', data);
+        //         } else {
+        //             console.error('파일 업로드 실패:', data);
+        //         }
+        //     });
+        //     // const response = await fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', {
+        //     //     method: 'POST',
+        //     //     body: formData,
+        //     // });
 
-            // const data = await response.json();
-            // if (response.ok) {
-            //     localStorage.setItem('unitList', data.unitName); // 추후에 이름을 바꿔야 될 수도 있음
-            //     localStorage.setItem('unitIdx', data.listIdx);
-            //     console.log('파일 업로드 성공:', data);
-            //     setLoading(false);
-            //     navigate('/analysis');
-            // } else {
-            //     console.error('파일 업로드 실패:', data);
-            //     setLoading(false);
-            // }
+        //     // const data = await response.json();
+        //     // if (response.ok) {
+        //     //     localStorage.setItem('unitList', data.unitName); // 추후에 이름을 바꿔야 될 수도 있음
+        //     //     localStorage.setItem('unitIdx', data.listIdx);
+        //     //     console.log('파일 업로드 성공:', data);
+        //     //     setLoading(false);
+        //     //     navigate('/analysis');
+        //     // } else {
+        //     //     console.error('파일 업로드 실패:', data);
+        //     //     setLoading(false);
+        //     // }
+        //     setLoading(false);
+        //     navigate('/analysis');
+        // }
+        // catch (error) {
+        //     console.error('서버 에러:', error);
+        // }
+            const formData = new FormData();
+
+            // Append all files to formData with respective keys
+            unitInitFiles.forEach(file => formData.append('init', file, file.name));
+            eventFiles.forEach(file => formData.append('event', file, file.name));
+            behaviorFiles.forEach(file => formData.append('behavior', file, file.name));
+            unitAttributeFiles.forEach(file => formData.append('unit', file, file.name));
+            superiorAttributeFiles.forEach(file => formData.append('upper', file, file.name));
+
+            // Append the current timestamp
+            
+            // Single fetch request
+            const response = await fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log('파일 업로드 성공:', data);
+                navigate('/analysis', { state: {uploadedData: data}});
+            } else {
+                console.error('파일 업로드 실패:', data);
+            }
             setLoading(false);
-            navigate('/analysis');
         }
         catch (error) {
             console.error('서버 에러:', error);
+            setLoading(false);
         }
     }
 

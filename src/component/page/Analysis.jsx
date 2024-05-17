@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { useNavigate, Link, Navigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../ui/Button';
 import data from '../../data.json';
@@ -94,9 +94,12 @@ const Container3 = styled.div`
 function Analysis(props) {
     let Allunit = false; // 모든 부대를 대상으로 하는지 안하는지 확인
     // useState를 통해서 다른 요소가 바뀌면 재렌더링될때마다 false로 값이 바뀜
+    const location = useLocation();
+    const simulationTimeArray = location.state.uploadedData;
     const navigate = useNavigate();
     const [logTime, setLogTime] = useState([]); // 추후에 이 변수를 api로 계속 업데이트
     const [analysisResult, setAnalysisResult] = useState([]);
+    const [unitList, setUnitList] = useState([]);
     
     const [showSelected, setShowSelected] = useState(true);
     const selectedTitle = showSelected ? "▼ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요." : "▶ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요.";
@@ -127,9 +130,21 @@ function Analysis(props) {
             Allunit = true;
             return <p style={{fontWeight: "bold"}}>모든 부대를 대상으로 하는 특성입니다.</p>
         }
-        return TestObject.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
-            <Button type="armyunit" isSelected={selectedArmyUnit === index} title={TestObject[index]} 
+        return unitList.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
+            <Button type="armyunit" isSelected={selectedArmyUnit === index} title={unitList[index]} 
             key={index} onClick={()=>{setSelectedArmyUnit(index)}}/>
+        ))
+    }
+
+    const renderResult = () => {
+        return analysisResult.map((result, index) => (
+            <div>
+                <p>로그 ID : {result.logIdx}</p>
+                <p>분석 특성 : {result.analysisFeature}</p>
+                <p>분석 결과 : {result.result}</p>
+                <p>로그 생성 시간 : {result.logCreated}</p>
+                <p>생성 시간 : {result.createdAt}</p>
+            </div>
         ))
     }
 
@@ -140,12 +155,39 @@ function Analysis(props) {
         }
     }, [navigate, selectedFeature])
 
+    useEffect(() => {
+        if (location.state && location.state.uploadedData) {
+            // simulationTimeArray의 첫 번째 값을 simulTime 상태로 설정
+            setLogTime(simulationTimeArray);
+        }
+    }, [location.state]);
+    
+
+    const getUnitList = async () => { // api 200
+        try {
+            const response = await fetch(`http://localhost:8080/log/${logTime[selectedLog]}`, {
+                method: 'GET',
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setUnitList(data);
+            }
+            else {
+                console.error('에러');
+            }
+        }
+        catch {
+            console.error('에러');
+        }
+    }
+
 
     const LogList = () => {
         return logTime.map((log, index) => (
             <Button type="log" isSelected={selectedLog === index} title={log} key={index} onClick={()=>
             {setSelectedLog(index)
-            setSimulTime(log)}} /> // using test
+            setSimulTime(log)
+            getUnitList()}} />
         ));
     }
     const ExplainList = () => {
@@ -162,22 +204,22 @@ function Analysis(props) {
                 alert("시뮬레이션 날짜, 분석 특성, 분석 대상을 확인해주세요.")
                 return;
             }
-            const response = await fetch('http://localhost:8080/api/analyze', {
+            const response = await fetch('http://localhost:8080/api/analyze', { // api 300
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    trait: Feature[selectedFeature],
+                    characteristics: Feature[selectedFeature],
                     unit: TestObject[selectedArmyUnit],
-                    // logtime: logTime[selectedLog]
+                    logCreated: logTime[selectedLog]
                 })
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                const response2 = await fetch('http://localhost:8080/api/analyze/result', {
+                const response2 = await fetch('http://localhost:8080/api/analyze/result', { // api 301
                 method: 'GET',
                 headers: {
                     'Accept' : 'application/json', 
@@ -186,7 +228,7 @@ function Analysis(props) {
 
                 if (response2.ok) {
                     const analysisData = await response2.json();
-                    setAnalysisResult(...analysisResult, analysisData);
+                    setAnalysisResult(analysisData);
                 }
                 else {
                     console.error('분석 결과 가져오기 실패');
@@ -261,6 +303,7 @@ function Analysis(props) {
         setShowExplain={setShowExplain}
         text={chooseExplain >= 0 ? ExplainFeature[chooseExplain] : ""}
         /> */}
+        {renderResult()}
         
         </div>
     </div>
