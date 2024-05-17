@@ -165,7 +165,7 @@ function Analysis(props) {
 
     const getUnitList = async () => { // api 200
         try {
-            const response = await fetch(`http://localhost:8080/log/${logTime[selectedLog]}`, {
+            const response = await fetch(`http://localhost:3306/log/${logTime[selectedLog]}`, {
                 method: 'GET',
             });
             const data = await response.json();
@@ -204,7 +204,7 @@ function Analysis(props) {
                 alert("시뮬레이션 날짜, 분석 특성, 분석 대상을 확인해주세요.")
                 return;
             }
-            const response = await fetch('http://localhost:8080/api/analyze', { // api 300
+            const response = await fetch('http://localhost:3306/analyze', { // api 300
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -219,7 +219,7 @@ function Analysis(props) {
             const data = await response.json();
 
             if (response.ok) {
-                const response2 = await fetch('http://localhost:8080/api/analyze/result', { // api 301
+                const response2 = await fetch('http://localhost:3306/analyze/result', { // api 301
                 method: 'GET',
                 headers: {
                     'Accept' : 'application/json', 

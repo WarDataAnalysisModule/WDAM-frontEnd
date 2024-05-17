@@ -162,7 +162,7 @@ function FileUpload(props) {
             // Append the current timestamp
             
             // Single fetch request
-            const response = await fetch('https://efae87e0-e136-4ff6-9a76-3d6365e74cc6.mock.pstmn.io/files', {
+            const response = await fetch('http://localhost:3306/files', {
                 method: 'POST',
                 body: formData
             });
