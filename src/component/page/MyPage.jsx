@@ -70,15 +70,46 @@ function MyPage(props) {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [nickname, setName] = useState('');
-    const [username, setId] = useState('');
+    const [verifyPwd, setVerifyPwd] = useState('');
+    const [username, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const passwordCheck = password === nickname;
+    const passwordCheck = password === verifyPwd;
     const [pwVb, setPwVb] = useState(false);
+    const headerData = JSON.parse(localStorage.getItem('headerData'));
 
     useEffect(() => {
-        if (!localStorage.getItem('userId')) navigate('/');
+        if (!localStorage.getItem('headerData')) navigate('/');
+        check();
     }, [navigate])
+
+
+    const check = async() => {
+        try {
+            const response = await fetch('http://localhost:8080/users', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headerData
+                }
+            });
+            console.log(response);
+            const responseData = await response.json();
+            
+            // 서버 응답에 따른 처리
+            if (response.ok && responseData.code === "1000") {
+                setName(responseData.data.userName);
+                setPhoneNumber(responseData.data.phone);
+                setEmail(responseData.data.email);
+            } else {
+                // 데이터 가져오기 실패
+                alert("GET 실패");
+            }
+        }
+        catch (error) {
+            console.error('서버 에러:', error);
+            alert("GET 실패");
+        }
+    }
 
     const handleSubmit = async() => {
         try {
@@ -86,40 +117,37 @@ function MyPage(props) {
                 alert("비밀번호를 확인해주세요.");
                 return;
             }
+
             let updatedInfo = {};
-            const idx = localStorage.getItem('Idx');
             if (password) updatedInfo.password = password;
-            if (phoneNumber) updatedInfo.phoneNumber = phoneNumber;
-            if (email) updatedInfo.email = email;
+            else updatedInfo.password = null;
+            updatedInfo.userName = username;
+            updatedInfo.phone = phoneNumber;
+            updatedInfo.email = email;
+            
+            console.log(updatedInfo);
 
-            if (!updatedInfo) {
-                alert("정보를 입력하세요.");
-                return;
-            }
-            else {
-                console.log(updatedInfo);
-            }
-
-            const response = await fetch(`http://localhost:8080/api/user/update/${idx}`, {
+            const response = await fetch(`http://localhost:8080/users/update`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': headerData
                 },
                 body: JSON.stringify(updatedInfo)
             });
             console.log(response);
-            const data = await response.json();
+            const responseData = await response.json();
 
-                // 서버 응답에 따른 처리
-                if (response.ok) {
-                    // 회원가입 성공
-                    alert("정보 수정 성공");
-                    localStorage.setItem('userId', '');
-                    navigate('/');
-                } else {
-                    // 회원가입 실패
-                    alert("정보 수정 실패?");
-                }
+            // 서버 응답에 따른 처리
+            if (response.ok && responseData.code === "1000") {
+                // 정보 수정 성공
+                setPassword('');
+                setVerifyPwd('');
+                alert("정보 수정 성공");
+            } else {
+                // 정보 수정 실패
+                alert("정보 수정 실패");
+            }
         }
         catch (error) {
             console.error('서버 에러:', error);
@@ -127,13 +155,48 @@ function MyPage(props) {
         }
     }
 
+    const logout = async() => {
+        try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+            const response = await fetch('http://localhost:8080/users/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headerData
+                },
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                })
+            });
+            console.log(response);
+            const responseData = await response.json();
+            
+            // 서버 응답에 따른 처리
+            if (response.ok && responseData.code === "1000") {
+                localStorage.setItem('headerData', '');
+                localStorage.setItem('accessToken', '');
+                localStorage.setItem('refreshToken', '');
+                alert("로그아웃 되었습니다.");
+                navigate('/');
+            } else {
+                // 로그아웃 실패
+                alert("로그아웃 실패");
+            }
+        }
+        catch (error) {
+            console.error('서버 에러:', error);
+            alert("로그아웃 실패");
+        }
+    }
+
     return (
         <div>
             <ButtonContainer>
-                <Button type="tag" title="로그아웃" onClick={()=> {
-                    localStorage.setItem('userId', '');
-                    navigate('/');
-                }}/>
+                <Button type="tag" title="로그아웃" onClick={logout}/>
             </ButtonContainer>
         <Wrapper>
             <Link to="/">
@@ -147,7 +210,7 @@ function MyPage(props) {
                     height={60}
                     value={username}
                     onChange={(event) => {  // 여기를 camelCase로 변경
-                        setId(event.target.value);
+                        setName(event.target.value);
                     }}
                     placeHolder={localStorage.getItem('userId')}
                     disabled={true}  // 여기를 소문자로 변경
@@ -165,10 +228,10 @@ function MyPage(props) {
                 />
                 <TextInput 
                     height={60}
-                    value={nickname}
+                    value={verifyPwd}
                     type={pwVb ? "text" : "password"}
                     onChange={(event) => {  // 여기를 camelCase로 변경
-                        setName(event.target.value);
+                        setVerifyPwd(event.target.value);
                     }}
                     placeHolder="비밀번호 확인"  // 여기를 소문자로 변경
                     icon="password"
