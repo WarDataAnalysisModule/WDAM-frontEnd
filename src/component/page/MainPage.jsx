@@ -63,11 +63,10 @@ function MainPage(props) {
     const navigate = useNavigate();
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
-    const idx = localStorage.getItem('Idx');
     const [pwVb, setPwVb] = useState(false);
 
     useEffect(() => {
-        const IdCheck = localStorage.getItem('userId');
+        const IdCheck = localStorage.getItem('headerData');
         if (IdCheck) {
             navigate('/fileupload');
         }
@@ -76,30 +75,37 @@ function MainPage(props) {
 
     const login = async() => {
         try {
-            const response = await fetch('http://localhost:8080/api/user/login', {
+            const response = await fetch('http://localhost:8080/users/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: userId,
+                    userName: userId,
                     password: password
                 })
             });
             console.log(response);
-            const data = await response.json();
+            const responseData = await response.json();
 
-                // 서버 응답에 따른 처리
-                if (response.ok) {
-                    // 회원가입 성공
-                    localStorage.setItem('Idx', data.id);
-                    localStorage.setItem('userId', userId);
-                    alert("로그인 되었습니다.");
-                    navigate('/fileupload');
-                } else {
-                    // 회원가입 실패
-                    alert("아이디 또는 비밀번호가 일치하지 않습니다.");
-                }
+            // 서버 응답에 따른 처리
+            if (response.ok && responseData.code === "1000") {
+                // 바디와 Authorization 저장                
+                //const headerData = response.headers.get('Authorization');
+                const headerData = responseData.data.grantType+" "+responseData.data.accessToken;
+                const accessToken = responseData.data.accessToken;
+                const refreshToken = responseData.data.refreshToken;
+                
+                // 로컬 스토리지에 저장
+                localStorage.setItem('headerData', JSON.stringify(headerData));
+                localStorage.setItem('accessToken', JSON.stringify(accessToken));
+                localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+
+                navigate('/fileupload');
+            } else {
+                // 로그인 실패
+                alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+            }
         }
         catch (error) {
             console.error('서버 에러:', error);
