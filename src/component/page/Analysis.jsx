@@ -95,7 +95,7 @@ function Analysis(props) {
     let Allunit = false; // 모든 부대를 대상으로 하는지 안하는지 확인
     // useState를 통해서 다른 요소가 바뀌면 재렌더링될때마다 false로 값이 바뀜
     const location = useLocation();
-    const simulationTimeArray = location.state.uploadedData;
+    const simulationTimeArray = location.state.uploadedData.data;//[];
     const navigate = useNavigate();
     const [logTime, setLogTime] = useState([]); // 추후에 이 변수를 api로 계속 업데이트
     const [analysisResult, setAnalysisResult] = useState([]);
@@ -156,28 +156,43 @@ function Analysis(props) {
     }, [navigate, selectedFeature])
 
     useEffect(() => {
-        if (location.state && location.state.uploadedData) {
+        if (location.state && location.state.uploadedData.data) {
             // simulationTimeArray의 첫 번째 값을 simulTime 상태로 설정
             setLogTime(simulationTimeArray);
         }
     }, [location.state]);
     
+    useEffect(() => {
+        if (selectedLog !== -1 && simulTime) {
+            getUnitList();
+        }
+    }, [selectedLog, simulTime]);
 
     const getUnitList = async () => { // api 200
         try {
-            const response = await fetch(`http://localhost:3306/log/${logTime[selectedLog]}`, {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            const lgtime = logTime[selectedLog];
+            console.log(lgtime);
+            const response = await fetch(`http://localhost:8080/log/${lgtime}`, {
                 method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headerData
+                },
             });
             const data = await response.json();
             if (response.ok) {
                 setUnitList(data.data.unitList);
+                setAnalysisResult(data.data.result);
             }
             else {
-                console.error('에러');
+                console.error(response);
             }
         }
-        catch {
-            console.error('에러');
+        catch (error) {
+            console.error('에러2', error);
         }
     }
 
@@ -186,9 +201,8 @@ function Analysis(props) {
         return logTime.map((log, index) => (
             <Button type="log" isSelected={selectedLog === index} title={log} key={index} onClick={()=>
             {setSelectedLog(index)
-            setSimulTime(log)
-            getUnitList()}} />
-        ));
+            setSimulTime(log)}} />
+        ))
     }
     const ExplainList = () => {
         return Feature.map((feat, index) => (
@@ -200,16 +214,22 @@ function Analysis(props) {
 
     const submitAnalysis = async() => {
         try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
             if (selectedLog === -1 || selectedFeature === -1 || selectedArmyUnit === -1) {
                 alert("시뮬레이션 날짜, 분석 특성, 분석 대상을 확인해주세요.")
                 return;
             }
-            const response = await fetch('http://localhost:3306/analyze', { // api 300
+            const response = await fetch('http://localhost:8080/analyze', { // api 300
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': headerData
                 },
                 body: JSON.stringify({
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
                     characteristics: Feature[selectedFeature],
                     unit: TestObject[selectedArmyUnit],
                     logCreated: logTime[selectedLog]
@@ -219,7 +239,7 @@ function Analysis(props) {
             const data = await response.json();
 
             if (response.ok) {
-                const response2 = await fetch('http://localhost:3306/analyze/result', { // api 301
+                const response2 = await fetch('http://localhost:8080/analyze/result', { // api 301
                 method: 'GET',
                 headers: {
                     'Accept' : 'application/json', 

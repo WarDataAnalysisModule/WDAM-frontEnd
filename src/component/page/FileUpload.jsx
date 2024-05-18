@@ -6,6 +6,7 @@ import data from '../../data.json';
 import TextInput from '../ui/TextInput';
 import icon from '../../wdam.png';
 import Loading from '../content/Loading';
+import { event } from 'jquery';
 
 const Wrapper = styled.div`
     padding: 16px;
@@ -92,18 +93,17 @@ function FileUpload(props) {
 
         files.forEach(file => {
             if (file.name.includes('단위부대init')) {
-                tempUnitInit.push(file);
-            } else if (file.name.includes('event')) {
-                tempEvent.push(file);
-            } else if (file.name.includes('behavior')) {
-                tempBehavior.push(file);
+                tempUnitInit.push(...unitInitFiles, file);
+            } else if (file.name.includes('Event')) {
+                tempEvent.push(...eventFiles, file);
+            } else if (file.name.includes('Behavior')) {
+                tempBehavior.push(...behaviorFiles, file);
             } else if (file.name.startsWith('단위부대Attributes')) {
-                tempUnitAttr.push(file);
+                tempUnitAttr.push(...unitAttributeFiles, file);
             } else if (file.name.startsWith('상급부대Attributes')) {
-                tempSuperiorAttr.push(file);
+                tempSuperiorAttr.push(...superiorAttributeFiles, file);
             }
         });
-
         setUnitInitFiles(tempUnitInit);
         setEventFiles(tempEvent);
         setBehaviorFiles(tempBehavior);
@@ -152,27 +152,59 @@ function FileUpload(props) {
         try {
             const formData = new FormData();
 
-            // Append all files to formData with respective keys
-            unitInitFiles.forEach(file => formData.append('init', file, file.name));
-            eventFiles.forEach(file => formData.append('event', file, file.name));
-            behaviorFiles.forEach(file => formData.append('behavior', file, file.name));
-            unitAttributeFiles.forEach(file => formData.append('unit', file, file.name));
-            superiorAttributeFiles.forEach(file => formData.append('upper', file, file.name));
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
+            // // Append all files to formData with respective keys
+            // //console.log(unitAttributeFiles);
+            unitInitFiles.forEach(file => formData.append('init', file));
+            eventFiles.forEach(file => formData.append('event', file));
+            behaviorFiles.forEach(file => formData.append('behavior', file));
+            unitAttributeFiles.forEach(file => formData.append('unit', file));
+            superiorAttributeFiles.forEach(file => formData.append('upper', file));
+            formData.append('accessToken', accessToken);
+            formData.append('refreshToken', refreshToken);
+
+            for (let [key, value] of formData) {
+                console.log(key, value);
+              }
             // Append the current timestamp
             
             // Single fetch request
-            const response = await fetch('http://localhost:3306/files', {
+            const response = await fetch('http://localhost:8080/files', {
                 method: 'POST',
+                headers: {
+                    //'Content-type' : 'application/json',
+                    'Authorization' : headerData 
+                },
+                // body: JSON.stringify({
+                //     accessToken: accessToken,
+                //     refreshToken: refreshToken,
+                //     init: unitInitFiles,
+                //     event: eventFiles,
+                //     behavior: behaviorFiles,
+                //     unit: unitAttributeFiles,
+                //     upper: superiorAttributeFiles
+                // })
                 body: formData
             });
-
             const data = await response.json();
             if (response.ok) {
-                console.log('파일 업로드 성공:', data);
-                navigate('/analysis', { state: {uploadedData: data}});
+                
+                try {
+                    console.log('파일 업로드 성공:', data);
+                    navigate('/analysis', { state: {uploadedData: data}});
+                    //navigate('/analysis');
+                }
+                catch (error) {
+                    console.error('JSON 파싱 에러:', error);
+                    console.log('서버 응답 : ', data);
+                    alert('파일 업로드에 문제가 발생');
+                }
+                
             } else {
-                console.error('파일 업로드 실패:', data);
+                console.error('파일 업로드 실패:', data); // data.json?
             }
             setLoading(false);
         }
