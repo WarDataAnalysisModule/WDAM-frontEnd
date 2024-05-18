@@ -130,14 +130,18 @@ function Analysis(props) {
             Allunit = true;
             return <p style={{fontWeight: "bold"}}>모든 부대를 대상으로 하는 특성입니다.</p>
         }
-        return unitList.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
-            <Button type="armyunit" isSelected={selectedArmyUnit === index} title={unitList.unitName[index]} 
+        return unitList.length > 0 ? (
+            unitList.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
+            <Button type="armyunit" isSelected={selectedArmyUnit === index} title={unitList[index]} 
             key={index} onClick={()=>{setSelectedArmyUnit(index)}}/>
         ))
+        )
+        : (<p>No Units</p>);
     }
 
     const renderResult = () => {
-        return analysisResult.map((result, index) => (
+        return analysisResult.length > 0 ? (
+            analysisResult.map((result, index) => (
             <div>
                 <p>로그 ID : {result.logIdx}</p>
                 <p>분석 특성 : {result.analysisFeature}</p>
@@ -145,7 +149,8 @@ function Analysis(props) {
                 <p>로그 생성 시간 : {result.logCreated}</p>
                 <p>생성 시간 : {result.createdAt}</p>
             </div>
-        ))
+        )))
+        : (<p>No Result</p>);
     }
 
     useEffect(() => {
@@ -168,31 +173,40 @@ function Analysis(props) {
         }
     }, [selectedLog, simulTime]);
 
-    const getUnitList = async () => { // api 200
+    useEffect(() => {
+        console.log("unitList : ", unitList);
+    }, [unitList])
+
+    useEffect(() => {
+        console.log("analysisResult : ", analysisResult);
+    }, [analysisResult])
+    
+    const getUnitList = async () => {
         try {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
-            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
-            const lgtime = logTime[selectedLog];
-            console.log(lgtime);
+            const lgtime = logTime[selectedLog]; // '2024-01-23T13:45:26' 같은 형식이어야 함
+            console.log(headerData);
+            const url = `http://localhost:8080/log/${lgtime}`;
+            console.log(`url : ${url}`);
             const response = await fetch(`http://localhost:8080/log/${lgtime}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': headerData
-                },
+                }
             });
+    
             const data = await response.json();
             if (response.ok) {
+                console.log(data);
+                console.log(data.data.unitList);
                 setUnitList(data.data.unitList);
-                setAnalysisResult(data.data.result);
+                setAnalysisResult(data.data.logResults);
+            } else {
+                console.error('Failed to fetch logs:', response);
             }
-            else {
-                console.error(response);
-            }
-        }
-        catch (error) {
-            console.error('에러2', error);
+        } catch (error) {
+            console.error('Error fetching logs:', error);
         }
     }
 
@@ -231,12 +245,13 @@ function Analysis(props) {
                     accessToken: accessToken,
                     refreshToken: refreshToken,
                     characteristics: Feature[selectedFeature],
-                    unit: TestObject[selectedArmyUnit],
+                    unit: unitList[selectedArmyUnit],
                     logCreated: logTime[selectedLog]
                 })
             });
-
+            console.log("before data");
             const data = await response.json();
+            console.log("data", data);
 
             if (response.ok) {
                 const response2 = await fetch('http://localhost:8080/analyze/result', { // api 301
@@ -347,7 +362,7 @@ function Analysis(props) {
         )}
         
         <p style={{marginLeft: '240px'}}>{`${logTime[selectedLog]}
-         ${Feature[selectedFeature]} ${Allunit ? 'All' : TestObject[selectedArmyUnit]}`}</p>
+         ${Feature[selectedFeature]} ${Allunit ? 'All' : unitList[selectedArmyUnit]}`}</p>
         {/* 테스트용 문구 (api 연결 시 지워야함) */}
         
         <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
@@ -358,7 +373,10 @@ function Analysis(props) {
         setShowExplain={setShowExplain}
         text={chooseExplain >= 0 ? ExplainFeature[chooseExplain] : ""}
         /> */}
+        <ObjectContainer>
         {renderResult()}
+        </ObjectContainer>
+        
         
         </div>
     </div>

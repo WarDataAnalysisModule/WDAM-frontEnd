@@ -68,7 +68,7 @@ function MainPage(props) {
     useEffect(() => {
         const IdCheck = localStorage.getItem('headerData');
         if (IdCheck) {
-            navigate('/fileupload');
+            //navigate('/fileupload');
         }
 
     },[navigate])
