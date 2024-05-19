@@ -45,7 +45,7 @@ const Feature = [
     "인원/장비 수량 변화",
     "개체 탐지",
     "부대의 전투력",
-    "부대의 행동",
+    "부대 행동",
     "부대의 피해 상황",
     "부대 정보",
     "부대 상태 및 지원"
@@ -249,21 +249,22 @@ function Analysis(props) {
                     logCreated: logTime[selectedLog]
                 })
             });
-            console.log("before data");
-            const data = await response.json();
-            console.log("data", data);
+            console.log(response);
 
             if (response.ok) {
+                const headerData = JSON.parse(localStorage.getItem('headerData'));
                 const response2 = await fetch('http://localhost:8080/analyze/result', { // api 301
                 method: 'GET',
                 headers: {
-                    'Accept' : 'application/json', 
+                    'Accept' : 'application/json',
+                    'Authorization': headerData
                 }
                 });
 
                 if (response2.ok) {
                     const analysisData = await response2.json().data;
-                    setAnalysisResult(analysisData);
+                    const tempData = [...analysisResult, analysisData];
+                    setAnalysisResult(tempData);
                 }
                 else {
                     console.error('분석 결과 가져오기 실패');
@@ -277,6 +278,8 @@ function Analysis(props) {
             console.error('서버 에러:', error);
         }
     }
+    
+    
 
 
     const logout = async() => {

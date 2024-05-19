@@ -150,12 +150,13 @@ function FileUpload(props) {
     const submitFile = async() => {
         setLoading(true);
         try {
+            
             const formData = new FormData();
 
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
-
+            console.log(headerData);
             // // Append all files to formData with respective keys
             // //console.log(unitAttributeFiles);
             unitInitFiles.forEach(file => formData.append('init', file));
