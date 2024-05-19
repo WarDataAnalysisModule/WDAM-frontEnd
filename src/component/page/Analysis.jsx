@@ -189,6 +189,10 @@ function Analysis(props) {
             getUnitList();
         }
     }, [selectedLog])
+
+    useEffect(() => {
+
+    }, [analysisResult])
     
 
     const fetchUploadedData = async () => {
@@ -197,6 +201,7 @@ function Analysis(props) {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            
 
             const formData = new FormData();
             formData.append('accessToken', accessToken);
@@ -272,34 +277,48 @@ function Analysis(props) {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            ///////////////////////////////////////////////////
+            const formData = new FormData();
+            formData.append('accessToken', accessToken);
+            formData.append('refreshToken', refreshToken);
+            formData.append('characteristics', Feature[selectedFeature]);
+            formData.append('unit', unitList[selectedArmyUnit]);
+            formData.append('logCreated', logTime[selectedLog]);
+
+            ///////////////////////////////////////////
             if (selectedLog === -1 || selectedFeature === -1 || selectedArmyUnit === -1) {
                 alert("시뮬레이션 날짜, 분석 특성, 분석 대상을 확인해주세요.")
                 return;
             }
+            console.log(accessToken);
+            console.log(refreshToken);
+            console.log(headerData);
             const response = await fetch('http://localhost:8080/analyze', { // api 300
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    //'Content-Type': 'application/json',
                     'Authorization': headerData
                 },
-                body: JSON.stringify({
-                    accessToken: accessToken,
-                    refreshToken: refreshToken,
-                    characteristics: Feature[selectedFeature],
-                    unit: unitList[selectedArmyUnit],
-                    logCreated: logTime[selectedLog]
-                })
+                body: formData
             });
-            console.log(response);
+            // console.log(response);
 
             if (response.ok) {
                 const headerData = JSON.parse(localStorage.getItem('headerData'));
+                const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+                const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+
+                const formData = new FormData();
+                formData.append('accessToken', accessToken);
+                formData.append('refreshToken', refreshToken);
+                formData.append('logCreated', logTime[selectedLog]);
                 const response2 = await fetch('http://localhost:8080/analyze/result', { // api 301
                 method: 'GET',
                 headers: {
-                    'Accept' : 'application/json',
                     'Authorization': headerData
-                }
+                },
+                body: formData
                 });
 
                 if (response2.ok) {
@@ -312,7 +331,7 @@ function Analysis(props) {
                 }
             }
             else {
-                console.error('분석 업로드 실패:', data);
+                console.error('분석 업로드 실패:', response);
             }
         }
         catch (error) {
