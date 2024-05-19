@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../ui/Button';
-import data from '../../data.json';
 import TextInput from '../ui/TextInput';
 import icon from '../../wdam.png'
 
@@ -61,47 +60,46 @@ const Container2 = styled.div`
 
 function MainPage(props) {
     const navigate = useNavigate();
-    const [userId, setUserId] = useState('');
-    const [password, setPassword] = useState('');
-    const [pwVb, setPwVb] = useState(false);
+    const [userId, setUserId] = useState(''); // 아이디
+    const [password, setPassword] = useState(''); // 비밀번호
+    const [pwVb, setPwVb] = useState(false); // 비밀번호 암호화 on/off
 
     useEffect(() => {
-        const IdCheck = localStorage.getItem('headerData');
+        const IdCheck = localStorage.getItem('headerData'); // accessToken 전역변수로 저장
         if (IdCheck) {
             //navigate('/fileupload');
         }
 
-    },[navigate])
+    },[navigate]) // navigate 작동 시
 
     const login = async() => {
         try {
-            const response = await fetch('http://localhost:8080/users/login', {
+            const response = await fetch('http://localhost:8080/users/login', { // 로그인 api
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json', // json 형태로 request parameter 전달
                 },
                 body: JSON.stringify({
-                    userName: userId,
-                    password: password
+                    userName: userId, // 아이디
+                    password: password // 비밀번호
                 })
             });
-            console.log(response);
-            const responseData = await response.json();
+            
+            const responseData = await response.json(); // response json 형태로 받기
 
             // 서버 응답에 따른 처리
             if (response.ok && responseData.code === "1000") {
                 // 바디와 Authorization 저장                
-                //const headerData = response.headers.get('Authorization');
                 const headerData = responseData.data.grantType+" "+responseData.data.accessToken;
                 const accessToken = responseData.data.accessToken;
                 const refreshToken = responseData.data.refreshToken;
                 
-                // 로컬 스토리지에 저장
+                // 로컬 스토리지 (전역 변수)에 저장
                 localStorage.setItem('headerData', JSON.stringify(headerData));
                 localStorage.setItem('accessToken', JSON.stringify(accessToken));
                 localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
 
-                navigate('/fileupload');
+                navigate('/fileupload'); // 파일 업로드 페이지로 이동
             } else {
                 // 로그인 실패
                 alert("아이디 또는 비밀번호가 일치하지 않습니다.");
