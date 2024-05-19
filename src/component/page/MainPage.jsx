@@ -12,7 +12,6 @@ const Wrapper = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    //background-color: #f7f7f7;
 `;
 
 const Container = styled.div`
@@ -23,10 +22,8 @@ const Container = styled.div`
         margin-bottom: 16px;
     }
     
-    //box-shadow: 0 4px 8px rgba(0,0,0,0.1); // 그림자 추가
     padding: 24px;
     border-radius: 8px; // 테두리 둥글게
-    //background-color: #fff; // 배경색 변경
     margin-bottom: 24px; // 마진 변경
 `;
 
@@ -51,7 +48,6 @@ const Container2 = styled.div`
     display: flex; // Flex 컨테이너로 만듭니다
     justify-content: center; // 수평 중앙 정렬
     align-items: center; // 수직 중앙 정렬
-    //padding: 24px;
     border-radius: 8px;
     margin-top: 40px;
 `;

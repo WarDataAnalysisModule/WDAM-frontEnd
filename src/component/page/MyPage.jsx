@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../ui/Button';
-import data from '../../data.json';
 import TextInput from '../ui/TextInput';
 import icon from '../../wdam.png'
 
@@ -22,11 +21,8 @@ const Container = styled.div`
     :not(:last-child) {
         margin-bottom: 16px;
     }
-    
-    //box-shadow: 0 4px 8px rgba(0,0,0,0.1); // 그림자 추가
     padding: 24px;
     border-radius: 8px; // 테두리 둥글게
-    //background-color: #fff; // 배경색 변경
     margin-bottom: 24px; // 마진 변경
 `;
 
@@ -36,7 +32,6 @@ const Container2 = styled.div`
     display: flex; // Flex 컨테이너로 만듭니다
     justify-content: center; // 수평 중앙 정렬
     align-items: center; // 수직 중앙 정렬
-    //padding: 24px;
     border-radius: 8px;
     margin-top: 40px;
 `;
@@ -67,15 +62,15 @@ const ButtonContainer = styled.div`
 
 
 function MyPage(props) {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [verifyPwd, setVerifyPwd] = useState('');
-    const [username, setName] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const passwordCheck = password === verifyPwd;
-    const [pwVb, setPwVb] = useState(false);
-    const headerData = JSON.parse(localStorage.getItem('headerData'));
+    const navigate = useNavigate(); // 페이지 이동 때 사용
+    const [email, setEmail] = useState(''); // 이메일
+    const [password, setPassword] = useState(''); // 비밀번호
+    const [verifyPwd, setVerifyPwd] = useState(''); // 비밀번호 확인
+    const [username, setName] = useState(''); // 닉네임
+    const [phoneNumber, setPhoneNumber] = useState(''); // 전화번호
+    const passwordCheck = password === verifyPwd; // 비밀번호 확인 시 체크하는 변수 (boolean)
+    const [pwVb, setPwVb] = useState(false); // 비밀번호 암호화
+    const headerData = JSON.parse(localStorage.getItem('headerData')); // 전역변수로 저장된 accessToken 불러옴
 
     useEffect(() => {
         if (!localStorage.getItem('headerData')) navigate('/');
@@ -85,21 +80,19 @@ function MyPage(props) {
 
     const check = async() => {
         try {
-            const response = await fetch('http://localhost:8080/users', {
+            const response = await fetch('http://localhost:8080/users', { // 마이페이지 조회
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': headerData
+                    'Content-Type': 'application/json', // json으로 전달
+                    'Authorization': headerData // accessToken
                 }
             });
-            console.log(response);
-            const responseData = await response.json();
-            
+            const responseData = await response.json(); // json으로 response 받기
             // 서버 응답에 따른 처리
-            if (response.ok && responseData.code === "1000") {
+            if (response.ok && responseData.code === "1000") { // 정상적인 연결
                 setName(responseData.data.userName);
                 setPhoneNumber(responseData.data.phone);
-                setEmail(responseData.data.email);
+                setEmail(responseData.data.email); // 이름, 전화번호, 이메일 저장
             } else {
                 // 데이터 가져오기 실패
                 alert("GET 실패");
@@ -119,15 +112,13 @@ function MyPage(props) {
             }
 
             let updatedInfo = {};
-            if (password) updatedInfo.password = password;
-            else updatedInfo.password = null;
+            if (password) updatedInfo.password = password; // 비밀번호 수정될 시 
+            else updatedInfo.password = null; // 안될 시
             updatedInfo.userName = username;
             updatedInfo.phone = phoneNumber;
             updatedInfo.email = email;
-            
-            console.log(updatedInfo);
 
-            const response = await fetch(`http://localhost:8080/users/update`, {
+            const response = await fetch(`http://localhost:8080/users/update`, { // 유저 정보 업데이트
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -135,7 +126,7 @@ function MyPage(props) {
                 },
                 body: JSON.stringify(updatedInfo)
             });
-            console.log(response);
+            
             const responseData = await response.json();
 
             // 서버 응답에 따른 처리
@@ -161,7 +152,7 @@ function MyPage(props) {
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
-            const response = await fetch('http://localhost:8080/users/logout', {
+            const response = await fetch('http://localhost:8080/users/logout', { // 로그아웃
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -172,7 +163,7 @@ function MyPage(props) {
                     refreshToken: refreshToken
                 })
             });
-            console.log(response);
+            
             const responseData = await response.json();
             
             // 서버 응답에 따른 처리
