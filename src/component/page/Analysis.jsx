@@ -158,7 +158,12 @@ function Analysis(props) {
         if (selectedFeature === 6 || selectedFeature === 7) {
             
         }
-    }, [navigate, selectedFeature])
+        if (simulationTimeArray.length === 0) {
+            fetchUploadedData();
+        } else {
+            setLogTime(simulationTimeArray);
+        }
+    }, [navigate, simulationTimeArray])
 
     useEffect(() => {
         if (location.state && location.state.uploadedData.data) {
@@ -167,19 +172,55 @@ function Analysis(props) {
         }
     }, [location.state]);
     
+    // useEffect(() => {
+    //     if (selectedLog !== -1 && simulTime) {
+    //         getUnitList();
+    //     }
+    // }, [selectedLog, simulTime]);
+
     useEffect(() => {
-        if (selectedLog !== -1 && simulTime) {
+        if (logTime.length > 0 && selectedLog === -1) {
+            setSelectedLog(0);
+        }
+    }, [logTime]);
+
+    useEffect(() => {
+        if (selectedLog !== -1) {
             getUnitList();
         }
-    }, [selectedLog, simulTime]);
+    }, [selectedLog])
+    
 
-    useEffect(() => {
-        console.log("unitList : ", unitList);
-    }, [unitList])
+    const fetchUploadedData = async () => {
+        // Function to re-fetch the uploaded data if simulationTimeArray is empty
+        try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
-    useEffect(() => {
-        console.log("analysisResult : ", analysisResult);
-    }, [analysisResult])
+            const formData = new FormData();
+            formData.append('accessToken', accessToken);
+            formData.append('refreshToken', refreshToken);
+
+            const response = await fetch('http://localhost:8080/files', {
+                method: 'POST',
+                headers: {
+                    'Authorization': headerData 
+                },
+                body: formData
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setLogTime(data.data);
+            } else {
+                console.error('Failed to re-fetch uploaded data:', data);
+            }
+        } catch (error) {
+            console.error('Error re-fetching uploaded data:', error);
+        }
+    }
+
+    
     
     const getUnitList = async () => {
         try {
