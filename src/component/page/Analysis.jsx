@@ -1,44 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
-import { useNavigate, Link, Navigate, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
+import React, {useEffect, useState} from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../ui/Button';
-import data from '../../data.json';
-import TextInput from '../ui/TextInput';
-import icon from '../../wdam.png'
 import Log from '../ui/Log';
 import TextBox from '../ui/TextBox';
-
-const ButtonContainer = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 20px;
-`
-
-const ButtonContainer2 = styled.div`
-  position: absolute;
-  left: 240px; // 사이드바의 너비에 맞춰서 조정
-`
-
-const Container = styled.div`
-    display: flex;
-    margin-left: 220px;
-    margin-top: 20px;
-    position: absolute;
-    //position: relative;
-    
-    padding-left: 20px;
-    width: calc(100% - 240px);
-`
-
-const PropContainer = styled.div`
-    display: flex;
-    justify-content: left;
-    flex-wrap: wrap;
-    gap: 10px; // 버튼 사이의 간격
-    margin-top: 20px; // 버튼 상단 여백
-    margin-left: 220px;
-    padding-left: 20px;
-`
+import {
+    ButtonContainer,
+    ButtonContainer2,
+    PropContainer,
+    ObjectContainer,
+    Container3,
+    ContainerAnalysis
+} from '../style/StyleComponent';
 
 const Feature = [
     "부대 이동 속도 / 위치 변화",
@@ -61,35 +33,6 @@ const ExplainFeature = [
     "- 부대 정보 : 모든 부대의 이름, 상태, 구성인원, 장비, 무기를 이름별로 출력한다.",
     "- 부대 상태 및 지원 : 피해 상태가 Moderate Damaged인 모든 부대의 시뮬레이션 시간, 부대 이름, 화력을 분석한다."
 ]
-
-const TestObject = [ // api로 받아오는 걸로 바꿀 예정
-    "A-1-1중대",
-    "A-1-2중대",
-    "A-2-1중대",
-    "A-2-2중대",
-    "B-1-1중대",
-]
-
-const ObjectContainer = styled.div`
-margin-left: 240px;
-margin-bottom: 200px;
-padding: 20px;
-//margin: 20px;
-border: 1px solid #ccc;
-border-radius: 4px;
-background-color: #f8f8f8;
-color: #333;
-font-size: 16px;
-//margin-left: 240px;
-//margin-top: 20px;
-width: calc(50% - 320px);
-`
-
-const Container3 = styled.div`
-    margin-left: 240px;
-    margin-top: -150px;
-    margin-bottom: 100px;
-`
 
 function Analysis(props) {
     let Allunit = false; // 모든 부대를 대상으로 하는지 안하는지 확인
@@ -398,10 +341,10 @@ function Analysis(props) {
                     `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`]) // using test
             }}/>
         </ButtonContainer>
-        <Container>
+        <ContainerAnalysis>
             <Button type="square" title={`파일 업로드 시간 : ${simulTime}`} />
             {/* api로 시간 가져와야함 */}
-        </Container>
+        </ContainerAnalysis>
         <div style={{overflowY: "auto"}}>
         
         <p style={{marginLeft: '240px', marginTop: '120px', cursor: 'pointer'}} onClick={handleSelectedClick}>{selectedTitle}</p>
@@ -430,17 +373,9 @@ function Analysis(props) {
         
         <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
         {/*밑의 TextBox에 모듈의 분석 결과를 출력해줌. 그리고 그에 맞는 분석 특성과 대상을 같이 보여줘야함. */}
-        {/* <TextBox
-        title={Feature[selectedFeature]}
-        showExplain={showExplain}
-        setShowExplain={setShowExplain}
-        text={chooseExplain >= 0 ? ExplainFeature[chooseExplain] : ""}
-        /> */}
         <ObjectContainer>
         {renderResult()}
         </ObjectContainer>
-        
-        
         </div>
     </div>
     );

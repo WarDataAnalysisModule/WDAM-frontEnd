@@ -1,72 +1,16 @@
 import React, {useEffect, useRef, useState} from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
-import styled from 'styled-components';
 import Button from '../ui/Button';
-import data from '../../data.json';
-import TextInput from '../ui/TextInput';
 import icon from '../../wdam.png';
 import Loading from '../content/Loading';
-import { event } from 'jquery';
-
-const Wrapper = styled.div`
-    padding: 16px;
-    width: calc(100% - 32px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    //background-color: #f7f7f7;
-`;
-
-const Container = styled.div`
-    width: 100%;
-    max-width: 720px;
-
-    :not(:last-child) {
-        margin-bottom: 16px;
-    }
-    
-    //box-shadow: 0 4px 8px rgba(0,0,0,0.1); // 그림자 추가
-    padding: 24px;
-    border-radius: 8px; // 테두리 둥글게
-    //background-color: #fff; // 배경색 변경
-    margin-bottom: 24px; // 마진 변경
-`;
-
-const Container2 = styled.div`
-    width: 100%;
-    max-width: 720px;
-    display: flex; // Flex 컨테이너로 만듭니다
-    justify-content: center; // 수평 중앙 정렬
-    align-items: center; // 수직 중앙 정렬
-    //padding: 24px;
-    border-radius: 8px;
-    margin-top: 40px;
-`;
-
-const StyledButtonContainer = styled.div`
-  display: flex; // Flexbox 레이아웃 사용
-  justify-content: center; // 자식 요소들을 수평 중앙으로 정렬
-  gap: 16px; // 버튼 사이에 간격 추가
-  margin-top: 20px; // 상단 여백 추가
-  min-width: 120px;
-  padding: 10px 20px;
-`;
-
-const ButtonContainer = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 20px;
-
-`
-
-const FileButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px; // 버튼 사이의 간격
-  margin-top: 20px; // 버튼 상단 여백
-`;
+import {
+    Wrapper,
+    Container,
+    Container2,
+    StyledButtonContainer,
+    ButtonContainer,
+    FileButtonContainer
+} from '../style/StyleComponent';
 
 function FileUpload(props) {
     const fileRef = useRef(null);
@@ -84,7 +28,7 @@ function FileUpload(props) {
     const [unitAttributeFiles, setUnitAttributeFiles] = useState([]);
     const [superiorAttributeFiles, setSuperiorAttributeFiles] = useState([]);
 
-    const classifyFiles = () => {
+    const classifyFiles = () => { // 파일 종류 구별
         const tempUnitInit = [];
         const tempEvent = [];
         const tempBehavior = [];
@@ -158,7 +102,6 @@ function FileUpload(props) {
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
             console.log(headerData);
             // // Append all files to formData with respective keys
-            // //console.log(unitAttributeFiles);
             unitInitFiles.forEach(file => formData.append('init', file));
             eventFiles.forEach(file => formData.append('event', file));
             behaviorFiles.forEach(file => formData.append('behavior', file));
@@ -179,15 +122,6 @@ function FileUpload(props) {
                     //'Content-type' : 'application/json',
                     'Authorization' : headerData 
                 },
-                // body: JSON.stringify({
-                //     accessToken: accessToken,
-                //     refreshToken: refreshToken,
-                //     init: unitInitFiles,
-                //     event: eventFiles,
-                //     behavior: behaviorFiles,
-                //     unit: unitAttributeFiles,
-                //     upper: superiorAttributeFiles
-                // })
                 body: formData
             });
             const data = await response.json();

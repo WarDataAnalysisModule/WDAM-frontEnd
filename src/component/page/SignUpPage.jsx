@@ -2,62 +2,15 @@ import React, {useState} from 'react';
 import { useNavigate, Link, useRef } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../ui/Button';
-import data from '../../data.json';
 import TextInput from '../ui/TextInput';
 import icon from '../../wdam.png'
-
-
-const Wrapper = styled.div`
-    padding: 16px;
-    width: calc(100% - 32px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-`;
-
-const Container = styled.div`
-   width: 100%;
-    max-width: 720px;
-
-    :not(:last-child) {
-        margin-bottom: 16px;
-    }
-    
-    //box-shadow: 0 4px 8px rgba(0,0,0,0.1); // 그림자 추가
-    padding: 24px;
-    border-radius: 8px; // 테두리 둥글게
-    //background-color: #fff; // 배경색 변경
-    margin-bottom: 24px; // 마진 변경
-`;
-
-const Container2 = styled.div`
-    width: 100%;
-    max-width: 720px;
-    display: flex; // Flex 컨테이너로 만듭니다
-    justify-content: center; // 수평 중앙 정렬
-    align-items: center; // 수직 중앙 정렬
-    //padding: 24px;
-    border-radius: 8px;
-    margin-top: 40px;
-`;
-
-const InputsContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-`;
-
-
-const StyledButtonContainer = styled.div`
-  display: flex; // Flexbox 레이아웃 사용
-  justify-content: center; // 자식 요소들을 수평 중앙으로 정렬
-  gap: 16px; // 버튼 사이에 간격 추가
-  margin-top: 20px; // 상단 여백 추가
-  min-width: 120px;
-  margin-bottom: -20px;
-  padding: 10px 20px;
-`;
+import {
+    Wrapper,
+    Container,
+    Container2,
+    StyledButtonContainer,
+    InputsContainer
+} from '../style/StyleComponent';
 
 function SignUpPage(props) {
     const navigate = useNavigate();
