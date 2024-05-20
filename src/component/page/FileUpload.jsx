@@ -219,7 +219,6 @@ function FileUpload(props) {
                 </FileButtonContainer>
                 <StyledButtonContainer>
                     <Button title="분석하기 →" onClick={()=>submitFile()}/> 
-                    {/* /* onClick={submitFile} */}
                 </StyledButtonContainer>
                 
             </Container>

@@ -78,18 +78,18 @@ export const PropContainer = styled.div`
 `
 
 export const ObjectContainer = styled.div`
-margin-left: 240px;
-margin-bottom: 200px;
-padding: 20px;
-//margin: 20px;
-border: 1px solid #ccc;
-border-radius: 4px;
-background-color: #f8f8f8;
-color: #333;
-font-size: 16px;
-//margin-left: 240px;
-//margin-top: 20px;
-width: calc(50% - 320px);
+    margin-left: 240px;
+    margin-bottom: 200px;
+    padding: 20px;
+    //margin: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    color: #333;
+    font-size: 16px;
+    //margin-left: 240px;
+    //margin-top: 20px;
+    width: calc(50% - 320px);
 `
 
 export const Container3 = styled.div`
@@ -107,4 +107,19 @@ export const ContainerAnalysis = styled.div`
     
     padding-left: 20px;
     width: calc(100% - 240px);
+`
+
+export const ResultContainer = styled.div`
+    margin-left: 240px;
+    margin-bottom: 80px;
+    padding: 20px;
+    //margin: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    color: #333;
+    font-size: 16px;
+    //margin-left: 240px;
+    //margin-top: 20px;
+    width: calc(100% - 320px);
 `

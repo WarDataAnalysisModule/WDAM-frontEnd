@@ -3,13 +3,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../ui/Button';
 import Log from '../ui/Log';
 import TextBox from '../ui/TextBox';
+import Loading from '../content/Loading';
 import {
     ButtonContainer,
     ButtonContainer2,
     PropContainer,
     ObjectContainer,
     Container3,
-    ContainerAnalysis
+    ContainerAnalysis,
+    ResultContainer
 } from '../style/StyleComponent';
 
 const Feature = [
@@ -43,6 +45,7 @@ function Analysis(props) {
     const [logTime, setLogTime] = useState([]); // 추후에 이 변수를 api로 계속 업데이트
     const [analysisResult, setAnalysisResult] = useState([]);
     const [unitList, setUnitList] = useState([]);
+    const [loading, setLoading] = useState(false);
     
     const [showSelected, setShowSelected] = useState(true);
     const selectedTitle = showSelected ? "▼ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요." : "▶ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요.";
@@ -85,13 +88,13 @@ function Analysis(props) {
     const renderResult = () => {
         return analysisResult.length > 0 ? (
             analysisResult.map((result, index) => (
-            <div>
+            <ResultContainer>
                 <p>로그 ID : {result.logIdx}</p>
                 <p>분석 특성 : {result.analysisFeature}</p>
                 <p>분석 결과 : {result.result}</p>
                 <p>로그 생성 시간 : {result.logCreated}</p>
                 <p>생성 시간 : {result.createdAt}</p>
-            </div>
+            </ResultContainer>
         )))
         : (<p>No Result</p>);
     }
@@ -114,12 +117,6 @@ function Analysis(props) {
             setLogTime(simulationTimeArray);
         }
     }, [location.state]);
-    
-    // useEffect(() => {
-    //     if (selectedLog !== -1 && simulTime) {
-    //         getUnitList();
-    //     }
-    // }, [selectedLog, simulTime]);
 
     useEffect(() => {
         if (logTime.length > 0 && selectedLog === -1) {
@@ -216,6 +213,7 @@ function Analysis(props) {
     }
 
     const submitAnalysis = async() => {
+        setLoading(true);
         try {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
@@ -266,19 +264,22 @@ function Analysis(props) {
 
                 if (response2.ok) {
                     const analysisData = await response2.json().data;
-                    const tempData = [...analysisResult, analysisData];
-                    setAnalysisResult(tempData);
+                    setAnalysisResult(prev => [...prev, analysisData]);
+                    setLoading(false);
                 }
                 else {
                     console.error('분석 결과 가져오기 실패');
+                    setLoading(false);
                 }
             }
             else {
                 console.error('분석 업로드 실패:', response);
+                setLoading(false);
             }
         }
         catch (error) {
             console.error('서버 에러:', error);
+            setLoading(false);
         }
     }
     
@@ -325,6 +326,7 @@ function Analysis(props) {
 
     return (
     <div>
+        {loading ? <Loading></Loading> : null}
         <div style={{position: "fixed", width: "200px", height: "100%", 
         backgroundColor: "#F0F0F0", color: "black",
         fontSize: "17px", overflowY: "auto"}}><div style={{padding: "15px", textAlign: "center", fontWeight: "Bold", 
@@ -373,9 +375,9 @@ function Analysis(props) {
         
         <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
         {/*밑의 TextBox에 모듈의 분석 결과를 출력해줌. 그리고 그에 맞는 분석 특성과 대상을 같이 보여줘야함. */}
-        <ObjectContainer>
+        
         {renderResult()}
-        </ObjectContainer>
+        
         </div>
     </div>
     );
