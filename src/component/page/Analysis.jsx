@@ -57,7 +57,6 @@ function Analysis(props) {
     const [selectedFeature, setSelectedFeature] = useState(-1);
     const [selectedArmyUnit, setSelectedArmyUnit] = useState(-1);
 
-    let currentTime = new Date(); // using test 나중에 api 되면 변경 예정
     const [simulTime, setSimulTime] = useState(''); // using test 나중에 api 되면 변경 예정
 
 
@@ -88,7 +87,7 @@ function Analysis(props) {
     const renderResult = () => {
         return analysisResult.length > 0 ? (
             analysisResult.map((result, index) => (
-            <ResultContainer>
+            <ResultContainer key={index}>
                 <p>로그 ID : {result.logIdx}</p>
                 <p>분석 특성 : {result.analysisFeature}</p>
                 <p>분석 결과 : {result.result}</p>
@@ -129,10 +128,6 @@ function Analysis(props) {
             getUnitList();
         }
     }, [selectedLog])
-
-    useEffect(() => {
-
-    }, [analysisResult])
     
 
     const fetchUploadedData = async () => {
@@ -171,9 +166,6 @@ function Analysis(props) {
         try {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const lgtime = logTime[selectedLog]; // '2024-01-23T13:45:26' 같은 형식이어야 함
-            console.log(headerData);
-            const url = `http://localhost:8080/log/${lgtime}`;
-            console.log(`url : ${url}`);
             const response = await fetch(`http://localhost:8080/log/${lgtime}`, {
                 method: 'GET',
                 headers: {
@@ -184,8 +176,6 @@ function Analysis(props) {
     
             const data = await response.json();
             if (response.ok) {
-                console.log(data);
-                console.log(data.data.unitList);
                 setUnitList(data.data.unitList);
                 setAnalysisResult(data.data.logResults);
             } else {
@@ -213,6 +203,7 @@ function Analysis(props) {
     }
 
     const submitAnalysis = async() => {
+        if (loading) return;
         setLoading(true);
         try {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
@@ -242,7 +233,6 @@ function Analysis(props) {
                 },
                 body: formData
             });
-            // console.log(response);
 
             if (response.ok) {
                 const headerData = JSON.parse(localStorage.getItem('headerData'));
@@ -255,7 +245,7 @@ function Analysis(props) {
                 formData.append('refreshToken', refreshToken);
                 formData.append('logCreated', logTime[selectedLog]);
                 const response2 = await fetch('http://localhost:8080/analyze/result', { // api 301
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     'Authorization': headerData
                 },
@@ -263,8 +253,10 @@ function Analysis(props) {
                 });
 
                 if (response2.ok) {
-                    const analysisData = await response2.json().data;
-                    setAnalysisResult(prev => [...prev, analysisData]);
+                    const data = await response2.json();
+                    const analysisData = data.data;
+                    setAnalysisResult(analysisData);
+                    //setAnalysisResult(analysisData);
                     setLoading(false);
                 }
                 else {
@@ -303,7 +295,6 @@ function Analysis(props) {
                     refreshToken: refreshToken
                 })
             });
-            console.log(response);
             const responseData = await response.json();
             
             // 서버 응답에 따른 처리
@@ -338,10 +329,6 @@ function Analysis(props) {
             <Button type="tag" title={"마이페이지"} onClick={()=> {
                 navigate('/mypage');
             }}/>
-            <Button title="test" type="tag" onClick={()=> {
-                setLogTime(logTime => [...logTime, 
-                    `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`]) // using test
-            }}/>
         </ButtonContainer>
         <ContainerAnalysis>
             <Button type="square" title={`파일 업로드 시간 : ${simulTime}`} />
@@ -368,10 +355,6 @@ function Analysis(props) {
                 <Container3><Button title={"분석하기"} onClick={submitAnalysis}></Button></Container3>
             </>
         )}
-        
-        <p style={{marginLeft: '240px'}}>{`${logTime[selectedLog]}
-         ${Feature[selectedFeature]} ${Allunit ? 'All' : unitList[selectedArmyUnit]}`}</p>
-        {/* 테스트용 문구 (api 연결 시 지워야함) */}
         
         <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
         {/*밑의 TextBox에 모듈의 분석 결과를 출력해줌. 그리고 그에 맞는 분석 특성과 대상을 같이 보여줘야함. */}
