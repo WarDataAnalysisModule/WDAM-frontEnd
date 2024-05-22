@@ -55,6 +55,7 @@ function MainPage(props) {
                 localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
 
                 navigate('/fileupload'); // 파일 업로드 페이지로 이동
+                console.log("로그인 성공: ", responseData);
             } else {
                 // 로그인 실패
                 alert("아이디 또는 비밀번호가 일치하지 않습니다.");
