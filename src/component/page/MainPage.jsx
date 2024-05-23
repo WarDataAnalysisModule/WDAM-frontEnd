@@ -45,7 +45,7 @@ function MainPage(props) {
             // 서버 응답에 따른 처리
             if (response.ok && responseData.code === "1000") {
                 // 바디와 Authorization 저장                
-                const headerData = responseData.data.grantType+" "+responseData.data.accessToken;
+                const headerData = response.headers.get('Authorization');
                 const accessToken = responseData.data.accessToken;
                 const refreshToken = responseData.data.refreshToken;
                 

@@ -68,7 +68,6 @@ function MyPage(props) {
             let updatedInfo = {};
             if (password) updatedInfo.password = password; // 비밀번호 수정될 시 
             else updatedInfo.password = null; // 안될 시
-            updatedInfo.userName = username;
             updatedInfo.phone = phoneNumber;
             updatedInfo.email = email;
 
@@ -154,10 +153,7 @@ function MyPage(props) {
                 <TextInput 
                     height={60}
                     value={username}
-                    onChange={(event) => {  // 여기를 camelCase로 변경
-                        setName(event.target.value);
-                    }}
-                    placeHolder={localStorage.getItem('userId')}
+                    placeHolder="아이디"
                     disabled={true}  // 여기를 소문자로 변경
                     icon="ID"
                 />
