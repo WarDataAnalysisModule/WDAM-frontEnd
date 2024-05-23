@@ -255,8 +255,8 @@ function Analysis(props) {
                 if (response2.ok) {
                     const data = await response2.json();
                     const analysisData = data.data;
+                    console.log(analysisData);
                     setAnalysisResult(analysisData);
-                    //setAnalysisResult(analysisData);
                     setLoading(false);
                 }
                 else {
