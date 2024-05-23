@@ -29,7 +29,7 @@ function MainPage(props) {
 
     const login = async() => {
         try {
-            const response = await fetch('http://localhost:8080/users/login', { // 로그인 api
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/login', { // 로그인 api
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json', // json 형태로 request parameter 전달

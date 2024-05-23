@@ -116,7 +116,7 @@ function FileUpload(props) {
             // Append the current timestamp
             
             // Single fetch request
-            const response = await fetch('http://localhost:8080/files', {
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/files', {
                 method: 'POST',
                 headers: {
                     //'Content-type' : 'application/json',
@@ -155,7 +155,7 @@ function FileUpload(props) {
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
-            const response = await fetch('http://localhost:8080/users/logout', {
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

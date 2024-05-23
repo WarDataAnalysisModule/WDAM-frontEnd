@@ -142,7 +142,7 @@ function Analysis(props) {
             formData.append('accessToken', accessToken);
             formData.append('refreshToken', refreshToken);
 
-            const response = await fetch('http://localhost:8080/files', {
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/files', {
                 method: 'POST',
                 headers: {
                     'Authorization': headerData 
@@ -166,7 +166,7 @@ function Analysis(props) {
         try {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const lgtime = logTime[selectedLog]; // '2024-01-23T13:45:26' 같은 형식이어야 함
-            const response = await fetch(`http://localhost:8080/log/${lgtime}`, {
+            const response = await fetch(`http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/log/${lgtime}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -225,7 +225,7 @@ function Analysis(props) {
             console.log(accessToken);
             console.log(refreshToken);
             console.log(headerData);
-            const response = await fetch('http://localhost:8080/analyze', { // api 300
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/analyze', { // api 300
                 method: 'POST',
                 headers: {
                     //'Content-Type': 'application/json',
@@ -244,7 +244,7 @@ function Analysis(props) {
                 formData.append('accessToken', accessToken);
                 formData.append('refreshToken', refreshToken);
                 formData.append('logCreated', logTime[selectedLog]);
-                const response2 = await fetch('http://localhost:8080/analyze/result', { // api 301
+                const response2 = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/analyze/result', { // api 301
                 method: 'POST',
                 headers: {
                     'Authorization': headerData
@@ -284,7 +284,7 @@ function Analysis(props) {
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
-            const response = await fetch('http://localhost:8080/users/logout', {
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/logout', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

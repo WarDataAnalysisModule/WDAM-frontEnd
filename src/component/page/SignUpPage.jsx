@@ -31,7 +31,7 @@ function SignUpPage(props) {
                 alert("정보를 정확하게 입력해주세요.")
             }
             else {
-                const response = await fetch('http://localhost:8080/users/signup', {
+                const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/signup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

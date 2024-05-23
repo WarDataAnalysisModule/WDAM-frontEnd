@@ -34,7 +34,7 @@ function MyPage(props) {
 
     const check = async() => {
         try {
-            const response = await fetch('http://localhost:8080/users', { // 마이페이지 조회
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users', { // 마이페이지 조회
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json', // json으로 전달
@@ -72,7 +72,7 @@ function MyPage(props) {
             updatedInfo.phone = phoneNumber;
             updatedInfo.email = email;
 
-            const response = await fetch(`http://localhost:8080/users/update`, { // 유저 정보 업데이트
+            const response = await fetch(`http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/update`, { // 유저 정보 업데이트
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ function MyPage(props) {
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
-            const response = await fetch('http://localhost:8080/users/logout', { // 로그아웃
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/logout', { // 로그아웃
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
