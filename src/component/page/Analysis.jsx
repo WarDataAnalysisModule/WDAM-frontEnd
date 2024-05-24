@@ -181,12 +181,18 @@ function Analysis(props) {
                 }
             });
     
-            const data = await response.json();
+            
             if (response.ok) {
+                const data = await response.json();
                 setUnitList(data.data.unitList);
                 setAnalysisResult(data.data.logResults);
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    getUnitList();         // 재시도
+                }
             } else {
-                console.error('Failed to fetch logs:', response);
+                console.error(`Failed to fetch logs: ${response.status}`);
             }
         } catch (error) {
             console.error('Error fetching logs:', error);
