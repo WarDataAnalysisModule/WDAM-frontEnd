@@ -149,11 +149,18 @@ function Analysis(props) {
                 },
                 body: formData
             });
-            const data = await response.json();
+            
+            
             if (response.ok) {
+                const data = await response.json();
                 setLogTime(data.data);
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    fetchUploadedData();         // 재시도
+                }
             } else {
-                console.error('Failed to re-fetch uploaded data:', data);
+                console.error(`Failed to re-fetch uploaded data: ${response.status}`);
             }
         } catch (error) {
             console.error('Error re-fetching uploaded data:', error);
