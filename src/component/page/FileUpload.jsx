@@ -166,24 +166,96 @@ function FileUpload(props) {
                     refreshToken: refreshToken
                 })
             });
-            console.log(response);
-            const responseData = await response.json();
-            
+        
             // 서버 응답에 따른 처리
-            if (response.ok && responseData.code === "1000") {
-                localStorage.setItem('headerData', '');
-                localStorage.setItem('accessToken', '');
-                localStorage.setItem('refreshToken', '');
-                alert("로그아웃 되었습니다.");
-                navigate('/');
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log(responseData);
+
+                if(responseData.code === "1000"){
+                    localStorage.setItem('headerData', '');
+                    localStorage.setItem('accessToken', '');
+                    localStorage.setItem('refreshToken', '');
+                    alert("로그아웃 되었습니다.");
+                    navigate('/');
+                } else {
+                    // 로그아웃 실패
+                    alert("로그아웃 실패");
+                }
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    logout();         // 재시도
+                }
             } else {
-                // 로그아웃 실패
-                alert("로그아웃 실패");
+                // 다른 HTTP status인 경우
+                alert(`로그아웃 실패: ${response.status}`);
             }
         }
         catch (error) {
             console.error('서버 에러:', error);
             alert("로그아웃 실패");
+        }
+    }
+
+    const retry = async() => {
+        try { 
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+            const response = await fetch('http://localhost:8080/users/reissue', { // 마이페이지 조회
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                })
+            });
+            
+            // 서버 응답에 따른 처리
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log(responseData);
+
+                if(responseData.code === "1000"){
+                    // 바디와 Authorization 저장                
+                    const headerData = response.headers.get('Authorization');
+                    const accessToken = responseData.data.accessToken;
+                    const refreshToken = responseData.data.refreshToken;
+                    
+                    // 로컬 스토리지 (전역 변수)에 저장
+                    localStorage.setItem('headerData', JSON.stringify(headerData));
+                    localStorage.setItem('accessToken', JSON.stringify(accessToken));
+                    localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+
+                    console.log("토큰발급 완료: ", responseData);
+                    return true;
+                } else {
+                    // 토근재발급 실패
+                    alert("로그아웃됨");
+                    return false;
+                }
+                
+            } else if(response.status === 401){
+                // 토근재발급 실패
+                localStorage.setItem('headerData', '');
+                localStorage.setItem('accessToken', '');
+                localStorage.setItem('refreshToken', '');
+                alert("로그아웃 되었습니다.");
+                navigate('/');
+                return false;
+            } else {
+                // 다른 HTTP status인 경우
+                alert(`토큰발급 실패: ${response.status}`);
+                return false;
+            }
+        }
+        catch (error) {
+            console.error('토큰발급:', error);
+            alert("로그아웃됨");
+            return false;
         }
     }
 
@@ -198,7 +270,7 @@ function FileUpload(props) {
                 }}/>
             </ButtonContainer>
         <Wrapper>
-            <Link to="/">
+            <Link to="/FileUpload">
                 <Container2>
                     <img src={icon} alt="img" style={{maxWidth: '300px', height: 'auto', pointerEvents: 'all'}}/>
                 </Container2>
