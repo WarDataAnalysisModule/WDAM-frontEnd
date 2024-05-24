@@ -295,18 +295,30 @@ function Analysis(props) {
                     refreshToken: refreshToken
                 })
             });
-            const responseData = await response.json();
             
             // 서버 응답에 따른 처리
-            if (response.ok && responseData.code === "1000") {
-                localStorage.setItem('headerData', '');
-                localStorage.setItem('accessToken', '');
-                localStorage.setItem('refreshToken', '');
-                alert("로그아웃 되었습니다.");
-                navigate('/');
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log(responseData);
+
+                if(responseData.code === "1000"){
+                    localStorage.setItem('headerData', '');
+                    localStorage.setItem('accessToken', '');
+                    localStorage.setItem('refreshToken', '');
+                    alert("로그아웃 되었습니다.");
+                    navigate('/');
+                } else {
+                    // 로그아웃 실패
+                    alert("로그아웃 실패");
+                }
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    logout();         // 재시도
+                }
             } else {
-                // 로그아웃 실패
-                alert("로그아웃 실패");
+                // 다른 HTTP status인 경우
+                alert(`로그아웃 실패: ${response.status}`);
             }
         }
         catch (error) {
