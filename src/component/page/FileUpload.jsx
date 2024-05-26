@@ -124,9 +124,9 @@ function FileUpload(props) {
                 },
                 body: formData
             });
-            const data = await response.json();
+            
             if (response.ok) {
-                
+                const data = await response.json();
                 try {
                     console.log('파일 업로드 성공:', data);
                     navigate('/analysis', { state: {uploadedData: data}});
@@ -138,8 +138,13 @@ function FileUpload(props) {
                     alert('파일 업로드에 문제가 발생');
                 }
                 
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    submitFile();         // 재시도
+                }
             } else {
-                console.error('파일 업로드 실패:', data); // data.json?
+                console.error(`파일 업로드 실패: ${response.status}`); // data.json?
             }
             setLoading(false);
         }
