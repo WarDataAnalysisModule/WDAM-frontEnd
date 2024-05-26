@@ -248,36 +248,15 @@ function Analysis(props) {
             });
 
             if (response.ok) {
-                const headerData = JSON.parse(localStorage.getItem('headerData'));
-                const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-                const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
-
-
-                const formData = new FormData();
-                formData.append('accessToken', accessToken);
-                formData.append('refreshToken', refreshToken);
-                formData.append('logCreated', logTime[selectedLog]);
-                const response2 = await fetch('http://localhost:8080/analyze/result', { // api 301
-                method: 'POST',
-                headers: {
-                    'Authorization': headerData
-                },
-                body: formData
-                });
-
-                if (response2.ok) {
-                    const data = await response2.json();
-                    const analysisData = data.data;
-                    console.log(analysisData);
-                    setAnalysisResult(analysisData);
+                await fetchAnalysisResult();
+            } else if (response.status === 401) {
+                const retryResult = await retry();
+                if (retryResult) {
+                    await submitAnalysis(); // 재시도
+                } else {
                     setLoading(false);
                 }
-                else {
-                    console.error('분석 결과 가져오기 실패');
-                    setLoading(false);
-                }
-            }
-            else {
+            } else {
                 console.error('분석 업로드 실패:', response);
                 setLoading(false);
             }
@@ -288,7 +267,47 @@ function Analysis(props) {
         }
     }
     
-    
+    const fetchAnalysisResult = async () => {
+        try{
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+
+            const formData = new FormData();
+            formData.append('accessToken', accessToken);
+            formData.append('refreshToken', refreshToken);
+            formData.append('logCreated', logTime[selectedLog]);
+            const response2 = await fetch('http://localhost:8080/analyze/result', { // api 301
+                method: 'POST',
+                headers: {
+                    'Authorization': headerData
+                },
+                body: formData
+            });
+
+            if (response2.ok) {
+                const data = await response2.json();
+                const analysisData = data.data;
+                console.log(analysisData);
+                setAnalysisResult(analysisData);
+                setLoading(false);
+            } else if (response2.status === 401) {
+                const retryResult = await retry();
+                if (retryResult) {
+                    await fetchAnalysisResult(); // 재시도
+                } else {
+                    setLoading(false);
+                }
+            } else {
+                console.error('분석 결과 가져오기 실패');
+                setLoading(false);
+            }
+        } catch (error) {
+            console.error('서버 에러:', error);
+            setLoading(false);
+        }
+    };
 
 
     const logout = async() => {
