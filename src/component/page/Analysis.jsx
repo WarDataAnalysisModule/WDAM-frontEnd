@@ -149,11 +149,18 @@ function Analysis(props) {
                 },
                 body: formData
             });
-            const data = await response.json();
+            
+            
             if (response.ok) {
+                const data = await response.json();
                 setLogTime(data.data);
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    fetchUploadedData();         // 재시도
+                }
             } else {
-                console.error('Failed to re-fetch uploaded data:', data);
+                console.error(`Failed to re-fetch uploaded data: ${response.status}`);
             }
         } catch (error) {
             console.error('Error re-fetching uploaded data:', error);
@@ -174,12 +181,18 @@ function Analysis(props) {
                 }
             });
     
-            const data = await response.json();
+            
             if (response.ok) {
+                const data = await response.json();
                 setUnitList(data.data.unitList);
                 setAnalysisResult(data.data.logResults);
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    getUnitList();         // 재시도
+                }
             } else {
-                console.error('Failed to fetch logs:', response);
+                console.error(`Failed to fetch logs: ${response.status}`);
             }
         } catch (error) {
             console.error('Error fetching logs:', error);
@@ -235,36 +248,15 @@ function Analysis(props) {
             });
 
             if (response.ok) {
-                const headerData = JSON.parse(localStorage.getItem('headerData'));
-                const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-                const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
-
-
-                const formData = new FormData();
-                formData.append('accessToken', accessToken);
-                formData.append('refreshToken', refreshToken);
-                formData.append('logCreated', logTime[selectedLog]);
-                const response2 = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/analyze/result', { // api 301
-                method: 'POST',
-                headers: {
-                    'Authorization': headerData
-                },
-                body: formData
-                });
-
-                if (response2.ok) {
-                    const data = await response2.json();
-                    const analysisData = data.data;
-                    setAnalysisResult(analysisData);
-                    //setAnalysisResult(analysisData);
+                await fetchAnalysisResult();
+            } else if (response.status === 401) {
+                const retryResult = await retry();
+                if (retryResult) {
+                    await submitAnalysis(); // 재시도
+                } else {
                     setLoading(false);
                 }
-                else {
-                    console.error('분석 결과 가져오기 실패');
-                    setLoading(false);
-                }
-            }
-            else {
+            } else {
                 console.error('분석 업로드 실패:', response);
                 setLoading(false);
             }
@@ -275,7 +267,47 @@ function Analysis(props) {
         }
     }
     
-    
+    const fetchAnalysisResult = async () => {
+        try{
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+
+            const formData = new FormData();
+            formData.append('accessToken', accessToken);
+            formData.append('refreshToken', refreshToken);
+            formData.append('logCreated', logTime[selectedLog]);
+            const response2 = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/analyze/result', { // api 301
+                method: 'POST',
+                headers: {
+                    'Authorization': headerData
+                },
+                body: formData
+            });
+
+            if (response2.ok) {
+                const data = await response2.json();
+                const analysisData = data.data;
+                console.log(analysisData);
+                setAnalysisResult(analysisData);
+                setLoading(false);
+            } else if (response2.status === 401) {
+                const retryResult = await retry();
+                if (retryResult) {
+                    await fetchAnalysisResult(); // 재시도
+                } else {
+                    setLoading(false);
+                }
+            } else {
+                console.error('분석 결과 가져오기 실패');
+                setLoading(false);
+            }
+        } catch (error) {
+            console.error('서버 에러:', error);
+            setLoading(false);
+        }
+    };
 
 
     const logout = async() => {
@@ -284,7 +316,7 @@ function Analysis(props) {
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
-            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/logout', { 
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -295,23 +327,96 @@ function Analysis(props) {
                     refreshToken: refreshToken
                 })
             });
-            const responseData = await response.json();
             
             // 서버 응답에 따른 처리
-            if (response.ok && responseData.code === "1000") {
-                localStorage.setItem('headerData', '');
-                localStorage.setItem('accessToken', '');
-                localStorage.setItem('refreshToken', '');
-                alert("로그아웃 되었습니다.");
-                navigate('/');
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log(responseData);
+
+                if(responseData.code === "1000"){
+                    localStorage.setItem('headerData', '');
+                    localStorage.setItem('accessToken', '');
+                    localStorage.setItem('refreshToken', '');
+                    alert("로그아웃 되었습니다.");
+                    navigate('/');
+                } else {
+                    // 로그아웃 실패
+                    alert("로그아웃 실패");
+                }
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    logout();         // 재시도
+                }
             } else {
-                // 로그아웃 실패
-                alert("로그아웃 실패");
+                // 다른 HTTP status인 경우
+                alert(`로그아웃 실패: ${response.status}`);
             }
         }
         catch (error) {
             console.error('서버 에러:', error);
             alert("로그아웃 실패");
+        }
+    }
+
+    const retry = async() => {
+        const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+        const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+        try {
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/reissue', { // 마이페이지 조회
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                })
+            });
+        
+            // 서버 응답에 따른 처리
+            if (response.ok) {
+                const responseData = await response.json();
+
+                if(responseData.code === "1000"){
+                    // 바디와 Authorization 저장                
+                    const headerData = response.headers.get('Authorization');
+                    const accessToken = responseData.data.accessToken;
+                    const refreshToken = responseData.data.refreshToken;
+                    
+                    console.log(headerData);
+                    // 로컬 스토리지 (전역 변수)에 저장
+                    localStorage.setItem('headerData', JSON.stringify(headerData));
+                    localStorage.setItem('accessToken', JSON.stringify(accessToken));
+                    localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+
+                    console.log("토큰발급 완료: ", responseData);
+                    return true;
+                } else {
+                    // 토근재발급 실패
+                    alert("로그아웃됨");
+                    return false;
+                }
+                
+            } else if(response.status === 401){
+                // 토근재발급 실패
+                localStorage.setItem('headerData', '');
+                localStorage.setItem('accessToken', '');
+                localStorage.setItem('refreshToken', '');
+                alert("로그아웃 되었습니다.");
+                navigate('/');
+                return false;
+            } else {
+                // 다른 HTTP status인 경우
+                alert(`토큰발급 실패: ${response.status}`);
+                return false;
+            }
+        }
+        catch (error) {
+            console.error('토큰발급:', error);
+            alert("로그아웃됨");
+            return false;
         }
     }
 
