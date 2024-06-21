@@ -57,7 +57,8 @@ margin-top: 20px; // 버튼 상단 여백
 background-color: ${(props)=>props.isSelected ? "#A0A0A0" : "#D0D0D0"};
 border: 1px solid transparent;
 height: 50px;
-width: 150px;
+padding: 0 20px;
+min-width: 150px;
 border-radius: 50px;
 font-size: 14px;
 text-align: center; // 가로 중앙
