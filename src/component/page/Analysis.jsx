@@ -88,11 +88,10 @@ function Analysis(props) {
         return analysisResult.length > 0 ? (
             analysisResult.map((result, index) => (
             <ResultContainer key={index}>
-                <p>로그 ID : {result.logIdx}</p>
                 <p>분석 특성 : {result.analysisFeature}</p>
                 <p>분석 결과 : {result.result}</p>
-                <p>로그 생성 시간 : {result.logCreated}</p>
-                <p>생성 시간 : {result.createdAt}</p>
+                <p>시뮬레이션 시간 : {result.logCreated}</p>
+                <p>분석 시간 : {result.createdAt}</p>
             </ResultContainer>
         )))
         : (<p>No Result</p>);
@@ -290,7 +289,7 @@ function Analysis(props) {
                 const data = await response2.json();
                 const analysisData = data.data;
                 console.log(analysisData);
-                setAnalysisResult(analysisData);
+                setAnalysisResult(analysisData.reverse());
                 setLoading(false);
             } else if (response2.status === 401) {
                 const retryResult = await retry();
@@ -436,8 +435,7 @@ function Analysis(props) {
             }}/>
         </ButtonContainer>
         <ContainerAnalysis>
-            <Button type="square" title={`파일 업로드 시간 : ${simulTime}`} />
-            {/* api로 시간 가져와야함 */}
+            <Button type="square" title={`시뮬레이션 시간 : ${logTime[selectedLog]}`} />
         </ContainerAnalysis>
         <div style={{overflowY: "auto"}}>
         
