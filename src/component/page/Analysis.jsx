@@ -226,12 +226,18 @@ function Analysis(props) {
             formData.append('accessToken', accessToken);
             formData.append('refreshToken', refreshToken);
             formData.append('characteristics', Feature[selectedFeature]);
-            formData.append('unit', unitList[selectedArmyUnit]);
+            if (selectedFeature === 6 || selectedFeature === 7) {
+                formData.append('unit', null);
+                selectedArmyUnit = -2;
+            } else {
+                formData.append('unit', unitList[selectedArmyUnit]);
+            }
             formData.append('logCreated', logTime[selectedLog]);
 
             ///////////////////////////////////////////
             if (selectedLog === -1 || selectedFeature === -1 || selectedArmyUnit === -1) {
                 alert("시뮬레이션 날짜, 분석 특성, 분석 대상을 확인해주세요.")
+                setLoading(false);
                 return;
             }
             console.log(accessToken);
