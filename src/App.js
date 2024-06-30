@@ -13,14 +13,6 @@ import FileUpload from "./component/page/FileUpload";
 import MyPage from "./component/page/MyPage";
 import Analysis from "./component/page/Analysis";
 
-const MainTitleText = styled.p`
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    margin-left: 20px;
-    color: #6a772b;
-`;
-
 function App(props) {
     return (
         <BrowserRouter>

@@ -25,7 +25,7 @@ font-size: 30px;
 export const Loading = () => {
     return (
         <Background>
-            <LoadingText>업로드 중입니다...</LoadingText>
+            <LoadingText>처리 중입니다...</LoadingText>
             <img src={Spinner} alt="로딩 중" width="20%" />
         </Background>
     )
