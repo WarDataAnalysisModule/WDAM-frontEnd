@@ -75,6 +75,7 @@ export const PropContainer = styled.div`
     margin-top: 20px; // 버튼 상단 여백
     margin-left: 220px;
     padding-left: 20px;
+    width: 700px;
 `
 
 export const ObjectContainer = styled.div`
@@ -82,9 +83,9 @@ export const ObjectContainer = styled.div`
     margin-bottom: 200px;
     padding: 20px;
     //margin: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f8f8f8;
+    border: none;
+    border-radius: 20px;
+    background-color: #F1F7Ff;
     color: #333;
     font-size: 16px;
     //margin-left: 240px;
@@ -100,8 +101,9 @@ export const Container3 = styled.div`
 
 export const ContainerAnalysis = styled.div`
     display: flex;
+    flex-direction: column;
     margin-left: 220px;
-    margin-top: 20px;
+    margin-top: 30px;
     position: absolute;
     //position: relative;
     
@@ -114,9 +116,9 @@ export const ResultContainer = styled.div`
     margin-bottom: 80px;
     padding: 20px;
     //margin: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f8f8f8;
+    border: none;
+    border-radius: 20px;
+    background-color: #F1F7Ff;
     color: #333;
     font-size: 16px;
     //margin-left: 240px;

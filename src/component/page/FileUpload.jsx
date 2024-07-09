@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import Button from '../ui/Button';
-import icon from '../../wdam.png';
+import icon from '../../wdam_modify.png';
 import Loading from '../content/Loading';
 import {
     Wrapper,

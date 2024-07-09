@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Button from '../ui/Button';
 import TextInput from '../ui/TextInput';
-import icon from '../../wdam.png'
+import icon from '../../wdam_modify.png'
 import {
     Wrapper,
     Container,

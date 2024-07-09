@@ -22,7 +22,6 @@ const Feature = [
     "부대 행동",
     "부대의 피해 상황",
     "부대 정보",
-    "부대 상태 및 지원"
 ]
 
 const ExplainFeature = [
@@ -48,7 +47,7 @@ function Analysis(props) {
     const [loading, setLoading] = useState(false);
     
     const [showSelected, setShowSelected] = useState(true);
-    const selectedTitle = showSelected ? "▼ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요." : "▶ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요.";
+    const selectedTitle = showSelected ? "▼ 분석 특성은 무엇인가요?" : "▶ 분석 특성은 무엇인가요?";
     const [showExplain, setShowExplain] = useState(false);
     const explainTitle = showExplain ? "▼ 설명" : "▶ 설명";
 
@@ -88,10 +87,9 @@ function Analysis(props) {
         return analysisResult.length > 0 ? (
             analysisResult.map((result, index) => (
             <ResultContainer key={index}>
-                <p>분석 특성 : {result.analysisFeature}</p>
-                <p>분석 결과 : {result.result}</p>
-                <p>시뮬레이션 시간 : {result.logCreated}</p>
-                <p>분석 시간 : {result.createdAt}</p>
+                <p style={{fontWeight: "bold"}}>(분석 대상)의 "{result.analysisFeature}"</p>
+                <p>{result.result}</p>
+                <p>분석 날짜 : {result.createdAt}</p>
             </ResultContainer>
         )))
         : (<p>No Result</p>);
@@ -430,8 +428,8 @@ function Analysis(props) {
         {loading ? <Loading></Loading> : null}
         <div style={{position: "fixed", width: "200px", height: "100%", 
         backgroundColor: "#F0F0F0", color: "black",
-        fontSize: "17px", overflowY: "auto"}}><div style={{padding: "15px", textAlign: "center", fontWeight: "Bold", 
-        marginBottom: "20px"}}>분석 로그</div><Log />{LogList()}</div>
+        fontSize: "17px"}}><div style={{padding: "15px", textAlign: "left", fontWeight: "Bold", 
+        marginBottom: "20px"}}>분석 내역</div><Log />{LogList()}</div>
         <ButtonContainer>
             <ButtonContainer2>{renderContent()}</ButtonContainer2>
             <Button type="tag" title="로그아웃" onClick={logout}/>
@@ -440,12 +438,14 @@ function Analysis(props) {
                 navigate('/mypage');
             }}/>
         </ButtonContainer>
+        
         <ContainerAnalysis>
+            <span style={{fontSize: "13px"}}>어느 시뮬레이션의 데이터를 분석하나요?</span>
             <Button type="square" title={`시뮬레이션 시간 : ${logTime[selectedLog]}`} />
         </ContainerAnalysis>
         <div style={{overflowY: "auto"}}>
         
-        <p style={{marginLeft: '240px', marginTop: '120px', cursor: 'pointer'}} onClick={handleSelectedClick}>{selectedTitle}</p>
+        <p style={{marginLeft: '240px', marginTop: '140px', cursor: 'pointer'}} onClick={handleSelectedClick}>{selectedTitle}</p>
         {showSelected && (
             <>
                 <PropContainer>
@@ -457,7 +457,7 @@ function Analysis(props) {
                 setShowExplain={setShowExplain}
                 text={ExplainFeature}
                 />
-                <p style={{marginLeft: '240px', marginTop: '120px'}}>분석대상을 선택해주세요.</p>
+                <p style={{marginLeft: '240px', marginTop: '120px'}}>분석하려는 대상은 무엇인가요?</p>
                 <ObjectContainer>
                     {renderObject()}
                 </ObjectContainer>
@@ -465,7 +465,7 @@ function Analysis(props) {
             </>
         )}
         
-        <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
+        <p style={{marginLeft: '240px', marginTop: '0px', fontWeight: 'bold'}}>분석 결과</p>
         {/*밑의 TextBox에 모듈의 분석 결과를 출력해줌. 그리고 그에 맞는 분석 특성과 대상을 같이 보여줘야함. */}
         
         {renderResult()}
