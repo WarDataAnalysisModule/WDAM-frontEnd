@@ -3,7 +3,7 @@ import { useNavigate, Link, useRef } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../ui/Button';
 import TextInput from '../ui/TextInput';
-import icon from '../../wdam.png'
+import icon from '../../wdam_modify.png'
 import {
     Wrapper,
     Container,

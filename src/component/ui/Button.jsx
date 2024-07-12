@@ -8,7 +8,7 @@ const StyledButton = styled.button`
     font-size: 16px;
     border-width: 1px;
     cursor: pointer;
-    background-color: #1187cf; /* 버튼의 배경색을 이미지의 녹색 톤으로 조정합니다. */
+    background-color: #1187cf; /* 버튼의 배경색을 이미지의 하늘색 톤으로 조정합니다. */
     color: white; /* 버튼 내의 글자색을 흰색으로 변경합니다. */
     border: none; /* 테두리를 제거합니다. */
     border-radius: 50px; /* 버튼의 모서리를 둥글게 처리합니다. */
@@ -17,7 +17,7 @@ const StyledButton = styled.button`
     cursor: pointer; /* 마우스 오버시 커서를 변경합니다. */
 
     &:hover {
-        background-color: #689f38; /* 마우스 오버시 버튼의 배경색을 어둡게 변경합니다. */
+        background-color: #0A65AD; /* 마우스 오버시 버튼의 배경색을 어둡게 변경합니다. */
     }
 `;
 
