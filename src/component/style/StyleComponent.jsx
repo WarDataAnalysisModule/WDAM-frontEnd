@@ -85,7 +85,7 @@ export const ObjectContainer = styled.div`
     //margin: 20px;
     border: none;
     border-radius: 20px;
-    background-color: #F1F7Ff;
+    background-color: #ECEFF6;
     color: #333;
     font-size: 16px;
     //margin-left: 240px;
@@ -118,7 +118,7 @@ export const ResultContainer = styled.div`
     //margin: 20px;
     border: none;
     border-radius: 20px;
-    background-color: #F1F7Ff;
+    background-color: #ECEFF6;
     color: #333;
     font-size: 16px;
     //margin-left: 240px;

@@ -87,7 +87,7 @@ function Analysis(props) {
         return analysisResult.length > 0 ? (
             analysisResult.map((result, index) => (
             <ResultContainer key={index}>
-                <p style={{fontWeight: "bold"}}>(분석 대상)의 "{result.analysisFeature}"</p>
+                <p style={{fontWeight: "bold"}}>"{result.analysisFeature}"</p>
                 <p>{result.result}</p>
                 <p>분석 날짜 : {result.createdAt}</p>
             </ResultContainer>
@@ -220,23 +220,31 @@ function Analysis(props) {
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
             ///////////////////////////////////////////////////
-            const formData = new FormData();
-            formData.append('accessToken', accessToken);
-            formData.append('refreshToken', refreshToken);
-            formData.append('characteristics', Feature[selectedFeature]);
-            if (selectedFeature === 6 || selectedFeature === 7) {
-                formData.append('unit', null);
-                selectedArmyUnit = -2;
-            } else {
-                formData.append('unit', unitList[selectedArmyUnit]);
-            }
-            formData.append('logCreated', logTime[selectedLog]);
+            // const formData = new FormData();
+            // formData.append('accessToken', accessToken);
+            // formData.append('refreshToken', refreshToken);
+            // formData.append('characteristics', Feature[selectedFeature]);
+            ///////////////////////////////////////////////////
+
+            // if (selectedFeature === 6 || selectedFeature === 7) {
+            //     formData.append('unit', null);
+            //     selectedArmyUnit = -2;
+            // } else {
+            //     formData.append('unit', unitList[selectedArmyUnit]);
+            // }
+            // formData.append('logCreated', logTime[selectedLog]);
 
             ///////////////////////////////////////////
+            
             if (selectedLog === -1 || selectedFeature === -1 || selectedArmyUnit === -1) {
                 alert("시뮬레이션 날짜, 분석 특성, 분석 대상을 확인해주세요.")
                 setLoading(false);
                 return;
+            }
+            let unit = unitList[selectedArmyUnit];
+            if (selectedFeature === 6 || selectedFeature === 7) {
+                unit = null;
+                selectedArmyUnit = -2;
             }
             console.log(accessToken);
             console.log(refreshToken);
@@ -244,10 +252,17 @@ function Analysis(props) {
             const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/analyze', { // api 300
                 method: 'POST',
                 headers: {
-                    //'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                     'Authorization': headerData
                 },
-                body: formData
+                // body: formData
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
+                    characteristics: Feature[selectedFeature],
+                    logCreated: logTime[selectedLog],
+                    unit: unit
+                })
             });
 
             if (response.ok) {

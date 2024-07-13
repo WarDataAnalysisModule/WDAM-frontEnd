@@ -297,7 +297,7 @@ function MyPage(props) {
                 />
                 </InputsContainer>
                 {!passwordCheck && (
-                    <p style={{textAlign: 'center', color:'red'}}>비밀번호가 다릅니다.</p>
+                    <p style={{textAlign: 'center', color:'red'}}>비밀번호가 일치하지 않습니다.</p>
                 )}
                 {passwordCheck && (
                     <p style={{textAlign: 'center', color:'green'}}>비밀번호가 일치합니다.</p>
