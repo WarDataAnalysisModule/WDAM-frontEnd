@@ -88,7 +88,9 @@ function Analysis(props) {
             analysisResult.map((result, index) => (
             <ResultContainer key={index}>
                 <p style={{fontWeight: "bold"}}>"{result.analysisFeature}"</p>
-                <p>{result.result}</p>
+                {result.result.split('\n').map((paragraph, pIndex) => (
+                    <p key={pIndex}>{paragraph}</p>
+                ))}
                 <p>분석 날짜 : {result.createdAt}</p>
             </ResultContainer>
         )))
