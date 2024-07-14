@@ -242,9 +242,10 @@ function Analysis(props) {
                 return;
             }
             let unit = unitList[selectedArmyUnit];
+            let selectedArmyUnitValue = selectedArmyUnit;
             if (selectedFeature === 6 || selectedFeature === 7) {
                 unit = null;
-                selectedArmyUnit = -2;
+                selectedArmyUnitValue = -2;
             }
             console.log(accessToken);
             console.log(refreshToken);
