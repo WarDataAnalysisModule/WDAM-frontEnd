@@ -71,7 +71,7 @@ function Analysis(props) {
 
     const renderObject = () => {
         if (selectedFeature === 6 || selectedFeature === 7) {
-            Allunit = true;
+            //Allunit = true;
             return <p style={{fontWeight: "bold"}}>모든 부대를 대상으로 하는 특성입니다.</p>
         }
         return unitList.length > 0 ? (
@@ -126,6 +126,13 @@ function Analysis(props) {
         }
     }, [selectedLog])
     
+    useEffect(() => {
+        if (selectedFeature === 6 || selectedFeature === 7) {
+            setSelectedArmyUnit(-2);
+        } else {
+            setSelectedArmyUnit(-1);
+        }
+    }, [selectedFeature]);
 
     const fetchUploadedData = async () => {
         // Function to re-fetch the uploaded data if simulationTimeArray is empty
@@ -241,12 +248,8 @@ function Analysis(props) {
                 setLoading(false);
                 return;
             }
-            let unit = unitList[selectedArmyUnit];
-            let selectedArmyUnitValue = selectedArmyUnit;
-            if (selectedFeature === 6 || selectedFeature === 7) {
-                unit = null;
-                selectedArmyUnitValue = -2;
-            }
+            const unit = (selectedFeature === 6 || selectedFeature === 7) ? null : unitList[selectedArmyUnit];
+        
             console.log(accessToken);
             console.log(refreshToken);
             console.log(headerData);
