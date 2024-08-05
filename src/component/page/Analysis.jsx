@@ -78,7 +78,7 @@ function Analysis(props) {
 
     const renderObject = () => {
         if (selectedFeature === 6 || selectedFeature === 7) {
-            Allunit = true;
+            //Allunit = true;
             return <p style={{fontWeight: "bold"}}>모든 부대를 대상으로 하는 특성입니다.</p>
         }
         return unitList.length > 0 ? (
@@ -95,7 +95,9 @@ function Analysis(props) {
             analysisResult.map((result, index) => (
             <ResultContainer key={index}>
                 <p style={{fontWeight: "bold"}}>"{result.analysisFeature}"</p>
-                <p>{result.result}</p>
+                {result.result.split('\n').map((paragraph, pIndex) => (
+                    <p key={pIndex}>{paragraph}</p>
+                ))}
                 <p>분석 날짜 : {formatDateTime(result.createdAt)}</p>
             </ResultContainer>
         )))
@@ -179,6 +181,13 @@ function Analysis(props) {
     checkAndRefreshToken();
     }, []);
     
+    useEffect(() => {
+        if (selectedFeature === 6 || selectedFeature === 7) {
+            setSelectedArmyUnit(-2);
+        } else {
+            setSelectedArmyUnit(-1);
+        }
+    }, [selectedFeature]);
 
     const fetchUploadedData = async () => {
         // Function to re-fetch the uploaded data if simulationTimeArray is empty
@@ -293,11 +302,8 @@ function Analysis(props) {
                 setLoading(false);
                 return;
             }
-            let unit = unitList[selectedArmyUnit];
-            if (selectedFeature === 6 || selectedFeature === 7) {
-                unit = null;
-                selectedArmyUnit = -2;
-            }
+            const unit = (selectedFeature === 6 || selectedFeature === 7) ? null : unitList[selectedArmyUnit];
+        
             console.log(accessToken);
             console.log(refreshToken);
             console.log(headerData);
