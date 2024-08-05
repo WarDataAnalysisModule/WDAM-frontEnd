@@ -35,10 +35,12 @@ export const Container2 = styled.div`
 export const StyledButtonContainer = styled.div`
     display: flex; // Flexbox 레이아웃 사용
     justify-content: center; // 자식 요소들을 수평 중앙으로 정렬
+    align-items: center;
     gap: 16px; // 버튼 사이에 간격 추가
     margin-top: 20px; // 상단 여백 추가
     min-width: 120px;
     padding: 10px 20px;
+    flex-direction: column;
 `;
 
 export const ButtonContainer = styled.div`

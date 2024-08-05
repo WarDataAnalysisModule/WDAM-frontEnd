@@ -32,7 +32,7 @@ const ExplainFeature = [
     "- 부대의 행동 : 분석 대상이 행하고 있는 동작을 출력한다.",
     "- 부대의 피해 상황 : 분석 대상의 인원, 장비 수량 변화와 피해 상태, 화력을 분석한다.",
     "- 부대 정보 : 모든 부대의 이름, 상태, 구성인원, 장비, 무기를 이름별로 출력한다.",
-    "- 부대 상태 및 지원 : 피해 상태가 Moderate Damaged인 모든 부대의 시뮬레이션 시간, 부대 이름, 화력을 분석한다."
+    // "- 부대 상태 및 지원 : 피해 상태가 Moderate Damaged인 모든 부대의 시뮬레이션 시간, 부대 이름, 화력을 분석한다."
 ]
 
 function Analysis(props) {
@@ -54,10 +54,17 @@ function Analysis(props) {
     const [chooseExplain, setChooseExplain] = useState(-1);
     const [selectedLog, setSelectedLog] = useState(-1);
     const [selectedFeature, setSelectedFeature] = useState(-1);
-    const [selectedArmyUnit, setSelectedArmyUnit] = useState(-1);
+    const [selectedArmyUnit, setSelectedArmyUnit] = useState(-1); 
 
-    const [simulTime, setSimulTime] = useState(''); // using test 나중에 api 되면 변경 예정
-
+    const formatDateTime = (dateTime) => {
+        const date = new Date(dateTime);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}시 ${minutes}분`;
+    };
 
     const handleSelectedClick = () => {
         setShowSelected(!showSelected);
@@ -89,7 +96,7 @@ function Analysis(props) {
             <ResultContainer key={index}>
                 <p style={{fontWeight: "bold"}}>"{result.analysisFeature}"</p>
                 <p>{result.result}</p>
-                <p>분석 날짜 : {result.createdAt}</p>
+                <p>분석 날짜 : {formatDateTime(result.createdAt)}</p>
             </ResultContainer>
         )))
         : (<p>No Result</p>);
@@ -125,6 +132,52 @@ function Analysis(props) {
             getUnitList();
         }
     }, [selectedLog])
+    useEffect(() => { // 새로고침 시 401 오류 해결
+        const checkAndRefreshToken = async () => {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+            if (accessToken && refreshToken) {
+                try {
+                    const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/reissue', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            accessToken: accessToken,
+                            refreshToken: refreshToken
+                        })
+                    });
+
+                    if (response.ok) {
+                        const responseData = await response.json();
+                        if (responseData.code === "1000") {
+                            const newHeaderData = response.headers.get('Authorization');
+                            const newAccessToken = responseData.data.accessToken;
+                            const newRefreshToken = responseData.data.refreshToken;
+
+                            localStorage.setItem('headerData', JSON.stringify(newHeaderData));
+                            localStorage.setItem('accessToken', JSON.stringify(newAccessToken));
+                            localStorage.setItem('refreshToken', JSON.stringify(newRefreshToken));
+                        } else {
+                            logout();
+                        }
+                    } else {
+                        logout();
+                    }
+                } catch (error) {
+                    console.error('토큰 갱신 실패:', error);
+                    logout();
+                }
+            } else {
+                logout();
+            }
+    };
+
+    checkAndRefreshToken();
+    }, []);
     
 
     const fetchUploadedData = async () => {
@@ -199,9 +252,8 @@ function Analysis(props) {
 
     const LogList = () => {
         return logTime.map((log, index) => (
-            <Button type="log" isSelected={selectedLog === index} title={log} key={index} onClick={()=>
-            {setSelectedLog(index)
-            setSimulTime(log)}} />
+            <Button type="log" isSelected={selectedLog === index} title={formatDateTime(log)} key={index} onClick={()=>
+            {setSelectedLog(index)}} />
         ))
     }
     const ExplainList = () => {
@@ -455,8 +507,8 @@ function Analysis(props) {
         </ButtonContainer>
         
         <ContainerAnalysis>
-            <span style={{fontSize: "13px"}}>어느 시뮬레이션의 데이터를 분석하나요?</span>
-            <Button type="square" title={`시뮬레이션 시간 : ${logTime[selectedLog]}`} />
+            <span style={{fontSize: "16px"}}>어느 시뮬레이션의 데이터를 분석하나요?</span>
+            <Button type="square" title={`시뮬레이션 시간 : ${formatDateTime(logTime[selectedLog])}`} />
         </ContainerAnalysis>
         <div style={{overflowY: "auto"}}>
         

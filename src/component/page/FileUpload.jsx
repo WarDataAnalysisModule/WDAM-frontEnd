@@ -75,6 +75,54 @@ function FileUpload(props) {
         if (files.length > 0) classifyFiles();
     }, [navigate, files])
 
+
+    useEffect(() => { // 새로고침 시 401 오류 해결
+        const checkAndRefreshToken = async () => {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+            if (accessToken && refreshToken) {
+                try {
+                    const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/reissue', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            accessToken: accessToken,
+                            refreshToken: refreshToken
+                        })
+                    });
+
+                    if (response.ok) {
+                        const responseData = await response.json();
+                        if (responseData.code === "1000") {
+                            const newHeaderData = response.headers.get('Authorization');
+                            const newAccessToken = responseData.data.accessToken;
+                            const newRefreshToken = responseData.data.refreshToken;
+
+                            localStorage.setItem('headerData', JSON.stringify(newHeaderData));
+                            localStorage.setItem('accessToken', JSON.stringify(newAccessToken));
+                            localStorage.setItem('refreshToken', JSON.stringify(newRefreshToken));
+                        } else {
+                            logout();
+                        }
+                    } else {
+                        logout();
+                    }
+                } catch (error) {
+                    console.error('토큰 갱신 실패:', error);
+                    logout();
+                }
+            } else {
+                logout();
+            }
+    };
+
+    checkAndRefreshToken();
+    }, []);
+
     const handleFileChange = (event) => {
         const selectedFiles = event.target.files;
         console.log(selectedFiles);
@@ -89,6 +137,15 @@ function FileUpload(props) {
         }
     }
     
+    const handleDrop = (event) => {
+        event.preventDefault();
+        const droppedFiles = event.dataTransfer.files;
+        setFiles(Array.from(droppedFiles));
+    };
+
+    const handleDragOver = (event) => {
+        event.preventDefault();
+    };
 
     // 데이터베이스로 파일 전송해주는 기능
     const submitFile = async() => {
@@ -288,8 +345,10 @@ function FileUpload(props) {
                 </div>
                 <p style={{fontSize: '30px', display: 'flex', textAlign: 'center', marginLeft: '123px', fontWeight: 'bold'}}>데이터베이스에 파일을 등록하세요.</p>
                 {files.length !== 0 && <p style={{fontSize: '30px', display: 'flex', textAlign: 'center', marginLeft: '80px', fontWeight: 'bold', marginTop: '-10px'}}>'분석하기'를 눌러 성공적으로 등록하세요.</p>}
-                <StyledButtonContainer>
+                <StyledButtonContainer onDrop={handleDrop} 
+                onDragOver={handleDragOver} style={{border: '2px dashed #ccc', padding: '20px', borderRadius: '10px'}}>
                     <Button title="파일 선택" onClick={handleButtonClick}/>
+                    <p>또는 파일을 여기에 드래그 하세요</p>
                 </StyledButtonContainer>
                 <FileButtonContainer>
                     {renderFileButtons()}

@@ -33,6 +33,52 @@ function MyPage(props) {
         } 
     }, [])
 
+    useEffect(() => { // 새로고침 시 401 오류 해결
+        const checkAndRefreshToken = async () => {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+            if (accessToken && refreshToken) {
+                try {
+                    const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/reissue', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            accessToken: accessToken,
+                            refreshToken: refreshToken
+                        })
+                    });
+
+                    if (response.ok) {
+                        const responseData = await response.json();
+                        if (responseData.code === "1000") {
+                            const newHeaderData = response.headers.get('Authorization');
+                            const newAccessToken = responseData.data.accessToken;
+                            const newRefreshToken = responseData.data.refreshToken;
+
+                            localStorage.setItem('headerData', JSON.stringify(newHeaderData));
+                            localStorage.setItem('accessToken', JSON.stringify(newAccessToken));
+                            localStorage.setItem('refreshToken', JSON.stringify(newRefreshToken));
+                        } else {
+                            logout();
+                        }
+                    } else {
+                        logout();
+                    }
+                } catch (error) {
+                    console.error('토큰 갱신 실패:', error);
+                    logout();
+                }
+            } else {
+                logout();
+            }
+    };
+
+    checkAndRefreshToken();
+    }, []);
 
     const check = async() => {
         try {
