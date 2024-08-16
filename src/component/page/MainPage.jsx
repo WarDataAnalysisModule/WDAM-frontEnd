@@ -34,6 +34,7 @@ function MainPage(props) {
                 headers: {
                     'Content-Type': 'application/json', // json 형태로 request parameter 전달
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     userName: userId, // 아이디
                     password: password // 비밀번호
@@ -47,12 +48,12 @@ function MainPage(props) {
                 // 바디와 Authorization 저장                
                 const headerData = response.headers.get('Authorization');
                 const accessToken = responseData.data.accessToken;
-                const refreshToken = responseData.data.refreshToken;
+                // const refreshToken = responseData.data.refreshToken;
                 
                 // 로컬 스토리지 (전역 변수)에 저장
                 localStorage.setItem('headerData', JSON.stringify(headerData));
                 localStorage.setItem('accessToken', JSON.stringify(accessToken));
-                localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+                // localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
 
                 navigate('/fileupload'); // 파일 업로드 페이지로 이동
             } else {

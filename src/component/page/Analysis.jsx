@@ -412,7 +412,7 @@ function Analysis(props) {
                 if(responseData.code === "1000"){
                     localStorage.setItem('headerData', '');
                     localStorage.setItem('accessToken', '');
-                    localStorage.setItem('refreshToken', '');
+                    // localStorage.setItem('refreshToken', '');
                     alert("로그아웃 되었습니다.");
                     navigate('/');
                 } else {
@@ -445,6 +445,7 @@ function Analysis(props) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     accessToken: accessToken,
                     refreshToken: refreshToken
@@ -459,13 +460,13 @@ function Analysis(props) {
                     // 바디와 Authorization 저장                
                     const headerData = response.headers.get('Authorization');
                     const accessToken = responseData.data.accessToken;
-                    const refreshToken = responseData.data.refreshToken;
+                    // const refreshToken = responseData.data.refreshToken;
                     
                     console.log(headerData);
                     // 로컬 스토리지 (전역 변수)에 저장
                     localStorage.setItem('headerData', JSON.stringify(headerData));
                     localStorage.setItem('accessToken', JSON.stringify(accessToken));
-                    localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+                    // localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
 
                     console.log("토큰발급 완료: ", responseData);
                     return true;
@@ -479,7 +480,7 @@ function Analysis(props) {
                 // 토근재발급 실패
                 localStorage.setItem('headerData', '');
                 localStorage.setItem('accessToken', '');
-                localStorage.setItem('refreshToken', '');
+                // localStorage.setItem('refreshToken', '');
                 alert("로그아웃 되었습니다.");
                 navigate('/');
                 return false;
