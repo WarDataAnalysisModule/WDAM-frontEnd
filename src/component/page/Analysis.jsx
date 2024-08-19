@@ -94,10 +94,12 @@ function Analysis(props) {
         return analysisResult.length > 0 ? (
             analysisResult.map((result, index) => (
             <ResultContainer key={index}>
-                <p style={{fontWeight: "bold"}}>"{result.analysisFeature}"</p>
+                <p style={{fontWeight: "bold"}}>분석 특성: "{result.analysisFeature}"</p>
+                <p>분석 대상 : {result.unitName}</p>
                 {result.result.split('\n').map((paragraph, pIndex) => (
                     <p key={pIndex}>{paragraph}</p>
                 ))}
+                {result.imgUrl !== null && <img src={result.imgUrl} alt="img" />}
                 <p>분석 날짜 : {formatDateTime(result.createdAt)}</p>
             </ResultContainer>
         )))
