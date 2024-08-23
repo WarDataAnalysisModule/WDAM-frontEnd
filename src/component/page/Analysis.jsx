@@ -145,6 +145,10 @@ function Analysis(props) {
         }
     }, [selectedFeature]);
 
+    useEffect(() => {
+        console.log(analysisResult);
+    })
+
     const fetchUploadedData = async () => {
         // Function to re-fetch the uploaded data if simulationTimeArray is empty
         try {
@@ -152,7 +156,6 @@ function Analysis(props) {
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
             const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
             
-
             const formData = new FormData();
             formData.append('accessToken', accessToken);
             formData.append('refreshToken', refreshToken);
@@ -321,8 +324,8 @@ function Analysis(props) {
             if (response2.ok) {
                 const data = await response2.json();
                 const analysisData = data.data;
-                console.log(analysisData);
-                setAnalysisResult(analysisData.reverse());
+                console.log("analysisData", analysisData);
+                setAnalysisResult(analysisData);
                 setLoading(false);
             } else if (response2.status === 401) {
                 const retryResult = await retry();
