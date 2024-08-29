@@ -97,7 +97,7 @@ function Analysis(props) {
                 <p style={{fontWeight: "bold"}}>분석 특성: "{result.analysisFeature}"</p>
                 <p>분석 대상 : {result.unitName}</p>
                 <p dangerouslySetInnerHTML={{__html: result.result}}></p>
-                {result.imgUrl !== null && <img src={result.imgUrl} alt="img" />}
+                {(result.analysisFeature == '부대 이동 속도 / 위치 변화' || result.analysisFeature == '부대의 피해 상황') && result.imgUrl !== null && <img src={result.imgUrl} alt="img" />}
                 <p>분석 날짜 : {formatDateTime(result.createdAt)}</p>
             </ResultContainer>
         )))
@@ -197,7 +197,8 @@ function Analysis(props) {
                 }
             });
     
-            
+            const responseData = await response.json();
+
             if (response.ok) {
                 const data = await response.json();
                 setUnitList(data.data.unitList);
@@ -207,7 +208,32 @@ function Analysis(props) {
                 if (retryResult) {
                     getUnitList();         // 재시도
                 }
-            } else {
+            } else if (responseData.code === 300) {
+                alert("잘못된 분석 특성을 입력받았습니다.")
+            } else if (responseData.code === 400) {
+                alert("해당 유저를 찾을 수 없습니다.")
+            } else if (responseData.code === 401) {
+                alert("해당 분석 결과를 찾을 수 없습니다.")
+            } else if (responseData.code === 402) {
+                alert("해당 unit_list가 없습니다.")
+            } else if (responseData.code === 403) {
+                alert("해당 unit_behavior가 없습니다.")
+            } else if (responseData.code === 404) {
+                alert("해당 event가 없습니다.")
+            } else if (responseData.code === 405) {
+                alert("해당 unit_init이 없습니다.")
+            } else if (responseData.code === 406) {
+                alert("해당 unit_attributes가 없습니다.")
+            } else if (responseData.code === 407) {
+                alert("해당 upper_attributes가 없습니다.")
+            } else if (responseData.code === 500 || responseData.code === 501) {
+                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
+            } else if (responseData.code === 502) {
+                alert("Data Save Failure")
+            } else if (responseData.code === 503) {
+                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
+            }
+            else {
                 console.error(`Failed to fetch logs: ${response.status}`);
             }
         } catch (error) {
@@ -279,7 +305,7 @@ function Analysis(props) {
                     unit: unit
                 })
             });
-
+            const responseData = await response.json();
             if (response.ok) {
                 await fetchAnalysisResult();
             } else if (response.status === 401) {
@@ -289,6 +315,30 @@ function Analysis(props) {
                 } else {
                     setLoading(false);
                 }
+            } else if (responseData.code === 300) {
+                alert("잘못된 분석 특성을 입력받았습니다.")
+            } else if (responseData.code === 400) {
+                alert("해당 유저를 찾을 수 없습니다.")
+            } else if (responseData.code === 401) {
+                alert("해당 분석 결과를 찾을 수 없습니다.")
+            } else if (responseData.code === 402) {
+                alert("해당 unit_list가 없습니다.")
+            } else if (responseData.code === 403) {
+                alert("해당 unit_behavior가 없습니다.")
+            } else if (responseData.code === 404) {
+                alert("해당 event가 없습니다.")
+            } else if (responseData.code === 405) {
+                alert("해당 unit_init이 없습니다.")
+            } else if (responseData.code === 406) {
+                alert("해당 unit_attributes가 없습니다.")
+            } else if (responseData.code === 407) {
+                alert("해당 upper_attributes가 없습니다.")
+            } else if (responseData.code === 500 || responseData.code === 501) {
+                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
+            } else if (responseData.code === 502) {
+                alert("Data Save Failure")
+            } else if (responseData.code === 503) {
+                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             } else {
                 console.error('분석 업로드 실패:', response);
                 setLoading(false);
@@ -360,7 +410,7 @@ function Analysis(props) {
                     refreshToken: refreshToken
                 })
             });
-            
+            const responseData = await response.json();
             // 서버 응답에 따른 처리
             if (response.ok) {
                 const responseData = await response.json();
@@ -381,6 +431,30 @@ function Analysis(props) {
                 if (retryResult) {
                     logout();         // 재시도
                 }
+            } else if (responseData.code === 300) {
+                alert("잘못된 분석 특성을 입력받았습니다.")
+            } else if (responseData.code === 400) {
+                alert("해당 유저를 찾을 수 없습니다.")
+            } else if (responseData.code === 401) {
+                alert("해당 분석 결과를 찾을 수 없습니다.")
+            } else if (responseData.code === 402) {
+                alert("해당 unit_list가 없습니다.")
+            } else if (responseData.code === 403) {
+                alert("해당 unit_behavior가 없습니다.")
+            } else if (responseData.code === 404) {
+                alert("해당 event가 없습니다.")
+            } else if (responseData.code === 405) {
+                alert("해당 unit_init이 없습니다.")
+            } else if (responseData.code === 406) {
+                alert("해당 unit_attributes가 없습니다.")
+            } else if (responseData.code === 407) {
+                alert("해당 upper_attributes가 없습니다.")
+            } else if (responseData.code === 500 || responseData.code === 501) {
+                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
+            } else if (responseData.code === 502) {
+                alert("Data Save Failure")
+            } else if (responseData.code === 503) {
+                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             } else {
                 // 다른 HTTP status인 경우
                 alert(`로그아웃 실패: ${response.status}`);
@@ -408,7 +482,7 @@ function Analysis(props) {
                     refreshToken: refreshToken
                 })
             });
-        
+            const responseData = await response.json();
             // 서버 응답에 따른 처리
             if (response.ok) {
                 const responseData = await response.json();
@@ -441,6 +515,30 @@ function Analysis(props) {
                 alert("로그아웃 되었습니다.");
                 navigate('/');
                 return false;
+            } else if (responseData.code === 300) {
+                alert("잘못된 분석 특성을 입력받았습니다.")
+            } else if (responseData.code === 400) {
+                alert("해당 유저를 찾을 수 없습니다.")
+            } else if (responseData.code === 401) {
+                alert("해당 분석 결과를 찾을 수 없습니다.")
+            } else if (responseData.code === 402) {
+                alert("해당 unit_list가 없습니다.")
+            } else if (responseData.code === 403) {
+                alert("해당 unit_behavior가 없습니다.")
+            } else if (responseData.code === 404) {
+                alert("해당 event가 없습니다.")
+            } else if (responseData.code === 405) {
+                alert("해당 unit_init이 없습니다.")
+            } else if (responseData.code === 406) {
+                alert("해당 unit_attributes가 없습니다.")
+            } else if (responseData.code === 407) {
+                alert("해당 upper_attributes가 없습니다.")
+            } else if (responseData.code === 500 || responseData.code === 501) {
+                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
+            } else if (responseData.code === 502) {
+                alert("Data Save Failure")
+            } else if (responseData.code === 503) {
+                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             } else {
                 // 다른 HTTP status인 경우
                 alert(`토큰발급 실패: ${response.status}`);

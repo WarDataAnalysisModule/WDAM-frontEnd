@@ -52,7 +52,7 @@ function SignUpPage(props) {
                     // 회원가입 성공
                     console.log('회원가입 성공:', responseData);
                     navigate('/');  // 회원가입 성공 후 리디렉션
-                } else {
+                } else if (responseData.code === "600") {
                     // 회원가입 실패
                     console.error('회원가입 실패:', responseData);
                     alert("아이디 또는 이메일이 중복되었습니다.");
