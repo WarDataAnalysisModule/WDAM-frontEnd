@@ -104,6 +104,15 @@ function Analysis(props) {
         : (<p>No Result</p>);
     }
 
+    const moveToTop = () => {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+    const moveToBottom = () => {
+        window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth'});
+    }
+
     useEffect(() => {
         if (!localStorage.getItem('headerData')) navigate('/');
         if (selectedFeature === 6 || selectedFeature === 7) {
@@ -200,9 +209,9 @@ function Analysis(props) {
             const responseData = await response.json();
 
             if (response.ok) {
-                const data = await response.json();
-                setUnitList(data.data.unitList);
-                setAnalysisResult(data.data.logResults);
+                // const data = await response.json();
+                setUnitList(responseData.data.unitList);
+                setAnalysisResult(responseData.data.logResults);
             } else if(response.status === 401){
                 const retryResult = await retry();
                 if (retryResult) {
@@ -413,7 +422,7 @@ function Analysis(props) {
             const responseData = await response.json();
             // 서버 응답에 따른 처리
             if (response.ok) {
-                const responseData = await response.json();
+                // const responseData = await response.json();
                 console.log(responseData);
 
                 if(responseData.code === "1000"){
@@ -485,7 +494,7 @@ function Analysis(props) {
             const responseData = await response.json();
             // 서버 응답에 따른 처리
             if (response.ok) {
-                const responseData = await response.json();
+                // const responseData = await response.json();
 
                 if(responseData.code === "1000"){
                     // 바디와 Authorization 저장                
@@ -598,7 +607,12 @@ function Analysis(props) {
         {/*밑의 TextBox에 모듈의 분석 결과를 출력해줌. 그리고 그에 맞는 분석 특성과 대상을 같이 보여줘야함. */}
         
         {renderResult()}
-        
+        <div style={{position: 'fixed', bottom: '30px', right: '40px', display: 'flex', flexDirection: 'column', border: '1px solid #d1d1d1', borderRadius: '10px', overflow: 'hidden'}}>
+        <button style={{width: "40px", height: "40px", zIndex: '1000', cursor: 'pointer', border: 'none', borderBottom: '1px solid #cccccc', backgroundColor: 'transparent'}}
+        onClick={moveToTop}>↑</button>
+        <button style={{width: "40px", height: "40px", zIndex: '1000', cursor: 'pointer', border: 'none', backgroundColor: 'transparent'}}
+        onClick={moveToBottom}>↓</button>
+        </div>
         </div>
     </div>
     );

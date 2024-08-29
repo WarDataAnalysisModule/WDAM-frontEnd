@@ -133,9 +133,9 @@ function FileUpload(props) {
                 },
                 body: formData
             });
-            const responseData = await response.json();
+            const data = await response.json();
             if (response.ok) {
-                const data = await response.json();
+                // const data = await response.json();
                 try {
                     console.log('파일 업로드 성공:', data);
                     navigate('/analysis', { state: {uploadedData: data}});
@@ -152,29 +152,29 @@ function FileUpload(props) {
                 if (retryResult) {
                     submitFile();         // 재시도
                 }
-            } else if (responseData.code === 300) {
+            } else if (data.code === 300) {
                 alert("잘못된 분석 특성을 입력받았습니다.")
-            } else if (responseData.code === 400) {
+            } else if (data.code === 400) {
                 alert("해당 유저를 찾을 수 없습니다.")
-            } else if (responseData.code === 401) {
+            } else if (data.code === 401) {
                 alert("해당 분석 결과를 찾을 수 없습니다.")
-            } else if (responseData.code === 402) {
+            } else if (data.code === 402) {
                 alert("해당 unit_list가 없습니다.")
-            } else if (responseData.code === 403) {
+            } else if (data.code === 403) {
                 alert("해당 unit_behavior가 없습니다.")
-            } else if (responseData.code === 404) {
+            } else if (data.code === 404) {
                 alert("해당 event가 없습니다.")
-            } else if (responseData.code === 405) {
+            } else if (data.code === 405) {
                 alert("해당 unit_init이 없습니다.")
-            } else if (responseData.code === 406) {
+            } else if (data.code === 406) {
                 alert("해당 unit_attributes가 없습니다.")
-            } else if (responseData.code === 407) {
+            } else if (data.code === 407) {
                 alert("해당 upper_attributes가 없습니다.")
-            } else if (responseData.code === 500 || responseData.code === 501) {
+            } else if (data.code === 500 || data.code === 501) {
                 alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
-            } else if (responseData.code === 502) {
+            } else if (data.code === 502) {
                 alert("Data Save Failure")
-            } else if (responseData.code === 503) {
+            } else if (data.code === 503) {
                 alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             } else {
                 console.error(`파일 업로드 실패: ${response.status}`); // data.json?
