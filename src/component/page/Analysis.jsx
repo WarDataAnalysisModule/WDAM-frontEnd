@@ -161,11 +161,11 @@ function Analysis(props) {
         try {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
             
             const formData = new FormData();
             formData.append('accessToken', accessToken);
-            formData.append('refreshToken', refreshToken);
+            // formData.append('refreshToken', refreshToken);
 
             const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/files', {
                 method: 'POST',
@@ -217,30 +217,6 @@ function Analysis(props) {
                 if (retryResult) {
                     getUnitList();         // 재시도
                 }
-            } else if (responseData.code === 300) {
-                alert("잘못된 분석 특성을 입력받았습니다.")
-            } else if (responseData.code === 400) {
-                alert("해당 유저를 찾을 수 없습니다.")
-            } else if (responseData.code === 401) {
-                alert("해당 분석 결과를 찾을 수 없습니다.")
-            } else if (responseData.code === 402) {
-                alert("해당 unit_list가 없습니다.")
-            } else if (responseData.code === 403) {
-                alert("해당 unit_behavior가 없습니다.")
-            } else if (responseData.code === 404) {
-                alert("해당 event가 없습니다.")
-            } else if (responseData.code === 405) {
-                alert("해당 unit_init이 없습니다.")
-            } else if (responseData.code === 406) {
-                alert("해당 unit_attributes가 없습니다.")
-            } else if (responseData.code === 407) {
-                alert("해당 upper_attributes가 없습니다.")
-            } else if (responseData.code === 500 || responseData.code === 501) {
-                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
-            } else if (responseData.code === 502) {
-                alert("Data Save Failure")
-            } else if (responseData.code === 503) {
-                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             }
             else {
                 console.error(`Failed to fetch logs: ${response.status}`);
@@ -271,7 +247,7 @@ function Analysis(props) {
         try {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
             ///////////////////////////////////////////////////
             // const formData = new FormData();
             // formData.append('accessToken', accessToken);
@@ -297,7 +273,7 @@ function Analysis(props) {
             const unit = (selectedFeature === 6 || selectedFeature === 7) ? null : unitList[selectedArmyUnit];
         
             console.log(accessToken);
-            console.log(refreshToken);
+            // console.log(refreshToken);
             console.log(headerData);
             const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/analyze', { // api 300
                 method: 'POST',
@@ -308,7 +284,7 @@ function Analysis(props) {
                 // body: formData
                 body: JSON.stringify({
                     accessToken: accessToken,
-                    refreshToken: refreshToken,
+                    // refreshToken: refreshToken,
                     characteristics: Feature[selectedFeature],
                     logCreated: logTime[selectedLog],
                     unit: unit
@@ -324,30 +300,42 @@ function Analysis(props) {
                 } else {
                     setLoading(false);
                 }
-            } else if (responseData.code === 300) {
+            } else if (responseData.code === "300") {
                 alert("잘못된 분석 특성을 입력받았습니다.")
-            } else if (responseData.code === 400) {
+                setLoading(false);
+            } else if (responseData.code === "400") {
                 alert("해당 유저를 찾을 수 없습니다.")
-            } else if (responseData.code === 401) {
+                setLoading(false);
+            } else if (responseData.code === "401") {
                 alert("해당 분석 결과를 찾을 수 없습니다.")
-            } else if (responseData.code === 402) {
+                setLoading(false);
+            } else if (responseData.code === "402") {
                 alert("해당 unit_list가 없습니다.")
-            } else if (responseData.code === 403) {
+                setLoading(false);
+            } else if (responseData.code === "403") {
                 alert("해당 unit_behavior가 없습니다.")
-            } else if (responseData.code === 404) {
+                setLoading(false);
+            } else if (responseData.code === "404") {
                 alert("해당 event가 없습니다.")
-            } else if (responseData.code === 405) {
+                setLoading(false);
+            } else if (responseData.code === "405") {
                 alert("해당 unit_init이 없습니다.")
-            } else if (responseData.code === 406) {
+                setLoading(false);
+            } else if (responseData.code === "406") {
                 alert("해당 unit_attributes가 없습니다.")
-            } else if (responseData.code === 407) {
+                setLoading(false);
+            } else if (responseData.code === "407") {
                 alert("해당 upper_attributes가 없습니다.")
-            } else if (responseData.code === 500 || responseData.code === 501) {
+                setLoading(false);
+            } else if (responseData.code === "500" || responseData.code == "501") {
                 alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
-            } else if (responseData.code === 502) {
+                setLoading(false);
+            } else if (responseData.code === "502") {
                 alert("Data Save Failure")
-            } else if (responseData.code === 503) {
+                setLoading(false);
+            } else if (responseData.code === "503") {
                 alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
+                setLoading(false);
             } else {
                 console.error('분석 업로드 실패:', response);
                 setLoading(false);
@@ -363,12 +351,12 @@ function Analysis(props) {
         try{
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
 
             const formData = new FormData();
             formData.append('accessToken', accessToken);
-            formData.append('refreshToken', refreshToken);
+            // formData.append('refreshToken', refreshToken);
             formData.append('logCreated', logTime[selectedLog]);
             const response2 = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/analyze/result', { // api 301
                 method: 'POST',
@@ -406,7 +394,7 @@ function Analysis(props) {
         try {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
             const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/logout', {
                 method: 'POST',
@@ -416,7 +404,7 @@ function Analysis(props) {
                 },
                 body: JSON.stringify({
                     accessToken: accessToken,
-                    refreshToken: refreshToken
+                    // refreshToken: refreshToken
                 })
             });
             const responseData = await response.json();
@@ -440,30 +428,6 @@ function Analysis(props) {
                 if (retryResult) {
                     logout();         // 재시도
                 }
-            } else if (responseData.code === 300) {
-                alert("잘못된 분석 특성을 입력받았습니다.")
-            } else if (responseData.code === 400) {
-                alert("해당 유저를 찾을 수 없습니다.")
-            } else if (responseData.code === 401) {
-                alert("해당 분석 결과를 찾을 수 없습니다.")
-            } else if (responseData.code === 402) {
-                alert("해당 unit_list가 없습니다.")
-            } else if (responseData.code === 403) {
-                alert("해당 unit_behavior가 없습니다.")
-            } else if (responseData.code === 404) {
-                alert("해당 event가 없습니다.")
-            } else if (responseData.code === 405) {
-                alert("해당 unit_init이 없습니다.")
-            } else if (responseData.code === 406) {
-                alert("해당 unit_attributes가 없습니다.")
-            } else if (responseData.code === 407) {
-                alert("해당 upper_attributes가 없습니다.")
-            } else if (responseData.code === 500 || responseData.code === 501) {
-                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
-            } else if (responseData.code === 502) {
-                alert("Data Save Failure")
-            } else if (responseData.code === 503) {
-                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             } else {
                 // 다른 HTTP status인 경우
                 alert(`로그아웃 실패: ${response.status}`);
@@ -477,7 +441,7 @@ function Analysis(props) {
 
     const retry = async() => {
         const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-        const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+        // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
         try {
             const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/reissue', { // 마이페이지 조회
@@ -488,7 +452,7 @@ function Analysis(props) {
                 credentials: 'include',
                 body: JSON.stringify({
                     accessToken: accessToken,
-                    refreshToken: refreshToken
+                    // refreshToken: refreshToken
                 })
             });
             const responseData = await response.json();
@@ -524,30 +488,6 @@ function Analysis(props) {
                 alert("로그아웃 되었습니다.");
                 navigate('/');
                 return false;
-            } else if (responseData.code === 300) {
-                alert("잘못된 분석 특성을 입력받았습니다.")
-            } else if (responseData.code === 400) {
-                alert("해당 유저를 찾을 수 없습니다.")
-            } else if (responseData.code === 401) {
-                alert("해당 분석 결과를 찾을 수 없습니다.")
-            } else if (responseData.code === 402) {
-                alert("해당 unit_list가 없습니다.")
-            } else if (responseData.code === 403) {
-                alert("해당 unit_behavior가 없습니다.")
-            } else if (responseData.code === 404) {
-                alert("해당 event가 없습니다.")
-            } else if (responseData.code === 405) {
-                alert("해당 unit_init이 없습니다.")
-            } else if (responseData.code === 406) {
-                alert("해당 unit_attributes가 없습니다.")
-            } else if (responseData.code === 407) {
-                alert("해당 upper_attributes가 없습니다.")
-            } else if (responseData.code === 500 || responseData.code === 501) {
-                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
-            } else if (responseData.code === 502) {
-                alert("Data Save Failure")
-            } else if (responseData.code === 503) {
-                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             } else {
                 // 다른 HTTP status인 경우
                 alert(`토큰발급 실패: ${response.status}`);

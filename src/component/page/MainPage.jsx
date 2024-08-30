@@ -56,30 +56,6 @@ function MainPage(props) {
                 // localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
 
                 navigate('/fileupload'); // 파일 업로드 페이지로 이동
-            } else if (responseData.code === 300) {
-                alert("잘못된 분석 특성을 입력받았습니다.")
-            } else if (responseData.code === 400) {
-                alert("해당 유저를 찾을 수 없습니다.")
-            } else if (responseData.code === 401) {
-                alert("해당 분석 결과를 찾을 수 없습니다.")
-            } else if (responseData.code === 402) {
-                alert("해당 unit_list가 없습니다.")
-            } else if (responseData.code === 403) {
-                alert("해당 unit_behavior가 없습니다.")
-            } else if (responseData.code === 404) {
-                alert("해당 event가 없습니다.")
-            } else if (responseData.code === 405) {
-                alert("해당 unit_init이 없습니다.")
-            } else if (responseData.code === 406) {
-                alert("해당 unit_attributes가 없습니다.")
-            } else if (responseData.code === 407) {
-                alert("해당 upper_attributes가 없습니다.")
-            } else if (responseData.code === 500 || responseData.code === 501) {
-                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
-            } else if (responseData.code === 502) {
-                alert("Data Save Failure")
-            } else if (responseData.code === 503) {
-                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             } else {
                 // 로그인 실패
                 alert("아이디 또는 비밀번호가 일치하지 않습니다.");

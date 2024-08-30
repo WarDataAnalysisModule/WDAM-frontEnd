@@ -108,7 +108,7 @@ function FileUpload(props) {
 
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
             console.log(headerData);
             // // Append all files to formData with respective keys
             unitInitFiles.forEach(file => formData.append('init', file));
@@ -117,7 +117,7 @@ function FileUpload(props) {
             unitAttributeFiles.forEach(file => formData.append('unit', file));
             superiorAttributeFiles.forEach(file => formData.append('upper', file));
             formData.append('accessToken', accessToken);
-            formData.append('refreshToken', refreshToken);
+            // formData.append('refreshToken', refreshToken);
 
             for (let [key, value] of formData) {
                 console.log(key, value);
@@ -152,30 +152,6 @@ function FileUpload(props) {
                 if (retryResult) {
                     submitFile();         // 재시도
                 }
-            } else if (data.code === 300) {
-                alert("잘못된 분석 특성을 입력받았습니다.")
-            } else if (data.code === 400) {
-                alert("해당 유저를 찾을 수 없습니다.")
-            } else if (data.code === 401) {
-                alert("해당 분석 결과를 찾을 수 없습니다.")
-            } else if (data.code === 402) {
-                alert("해당 unit_list가 없습니다.")
-            } else if (data.code === 403) {
-                alert("해당 unit_behavior가 없습니다.")
-            } else if (data.code === 404) {
-                alert("해당 event가 없습니다.")
-            } else if (data.code === 405) {
-                alert("해당 unit_init이 없습니다.")
-            } else if (data.code === 406) {
-                alert("해당 unit_attributes가 없습니다.")
-            } else if (data.code === 407) {
-                alert("해당 upper_attributes가 없습니다.")
-            } else if (data.code === 500 || data.code === 501) {
-                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
-            } else if (data.code === 502) {
-                alert("Data Save Failure")
-            } else if (data.code === 503) {
-                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             } else {
                 console.error(`파일 업로드 실패: ${response.status}`); // data.json?
             }
@@ -191,7 +167,7 @@ function FileUpload(props) {
         try {
             const headerData = JSON.parse(localStorage.getItem('headerData'));
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
             const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/logout', {
                 method: 'POST',
@@ -201,10 +177,9 @@ function FileUpload(props) {
                 },
                 body: JSON.stringify({
                     accessToken: accessToken,
-                    refreshToken: refreshToken
+                    // refreshToken: refreshToken
                 })
             });
-            const responseData = response.json();
             // 서버 응답에 따른 처리
             if (response.ok) {
                 const responseData = await response.json();
@@ -218,37 +193,14 @@ function FileUpload(props) {
                     navigate('/');
                 } else {
                     // 로그아웃 실패
+                    console.log(response, responseData);
                     alert("로그아웃 실패");
                 }
             } else if(response.status === 401){
                 const retryResult = await retry();
                 if (retryResult) {
                     logout();         // 재시도
-                }
-            } else if (responseData.code === 300) {
-                alert("잘못된 분석 특성을 입력받았습니다.")
-            } else if (responseData.code === 400) {
-                alert("해당 유저를 찾을 수 없습니다.")
-            } else if (responseData.code === 401) {
-                alert("해당 분석 결과를 찾을 수 없습니다.")
-            } else if (responseData.code === 402) {
-                alert("해당 unit_list가 없습니다.")
-            } else if (responseData.code === 403) {
-                alert("해당 unit_behavior가 없습니다.")
-            } else if (responseData.code === 404) {
-                alert("해당 event가 없습니다.")
-            } else if (responseData.code === 405) {
-                alert("해당 unit_init이 없습니다.")
-            } else if (responseData.code === 406) {
-                alert("해당 unit_attributes가 없습니다.")
-            } else if (responseData.code === 407) {
-                alert("해당 upper_attributes가 없습니다.")
-            } else if (responseData.code === 500 || responseData.code === 501) {
-                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
-            } else if (responseData.code === 502) {
-                alert("Data Save Failure")
-            } else if (responseData.code === 503) {
-                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
+                } 
             } else {
                 // 다른 HTTP status인 경우
                 alert(`로그아웃 실패: ${response.status}`);
@@ -263,7 +215,7 @@ function FileUpload(props) {
     const retry = async() => {
         try { 
             const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-            const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
 
             const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/reissue', { // 마이페이지 조회
                 method: 'POST',
@@ -273,7 +225,7 @@ function FileUpload(props) {
                 credentials: 'include',
                 body: JSON.stringify({
                     accessToken: accessToken,
-                    refreshToken: refreshToken
+                    // refreshToken: refreshToken
                 })
             });
             const responseData = response.json();
@@ -309,30 +261,6 @@ function FileUpload(props) {
                 alert("로그아웃 되었습니다.");
                 navigate('/');
                 return false;
-            } else if (responseData.code === 300) {
-                alert("잘못된 분석 특성을 입력받았습니다.")
-            } else if (responseData.code === 400) {
-                alert("해당 유저를 찾을 수 없습니다.")
-            } else if (responseData.code === 401) {
-                alert("해당 분석 결과를 찾을 수 없습니다.")
-            } else if (responseData.code === 402) {
-                alert("해당 unit_list가 없습니다.")
-            } else if (responseData.code === 403) {
-                alert("해당 unit_behavior가 없습니다.")
-            } else if (responseData.code === 404) {
-                alert("해당 event가 없습니다.")
-            } else if (responseData.code === 405) {
-                alert("해당 unit_init이 없습니다.")
-            } else if (responseData.code === 406) {
-                alert("해당 unit_attributes가 없습니다.")
-            } else if (responseData.code === 407) {
-                alert("해당 upper_attributes가 없습니다.")
-            } else if (responseData.code === 500 || responseData.code === 501) {
-                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
-            } else if (responseData.code === 502) {
-                alert("Data Save Failure")
-            } else if (responseData.code === 503) {
-                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
             } else {
                 // 다른 HTTP status인 경우
                 alert(`토큰발급 실패: ${response.status}`);
