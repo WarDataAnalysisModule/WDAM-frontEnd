@@ -26,7 +26,9 @@
 
 # 프로젝트 실행 방법
 $ npm install
+
 $ npm start
+
 빌드는 $ npm run build
 
 # 프로젝트 주의사항
