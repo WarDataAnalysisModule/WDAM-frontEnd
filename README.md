@@ -1,75 +1,36 @@
-<<<<<<< HEAD
-# Getting Started with Create React App
+# 🧑‍🏫 프로젝트 소개
+안녕하세요, 파도입니다.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+본 프로젝트에서는 **대규모 인공지능 언어모델을 활용한 전장 지식 자동 생성 기술 연구개발**이라는 주제로, 
+방대하고 복잡한 시계열 수치 형식의 전장 관측 데이터를 분석하기 위하여 이 프로젝트를 진행하게 됐습니다. 
+기존의 사람이 하던 일을 생성형 AI로 대체하여 전장 상황을 이해하고, 정확한 정보를 효율적으로 분석하도록 하는 것을 목표로 하였습니다.
 
-## Available Scripts
+저희는 편리하게 데이터를 업로드하고, 분석할 수 있는 전장 데이터 분석 모듈, **WDAM** 웹 애플리케이션을 제작하였습니다.
 
-In the project directory, you can run:
+⭐ 이 리포지토리는 **WDAM 웹 애플리케이션 제작 프로젝트의 프론트엔드 파트** 작업을 공유하는 리포지토리입니다.
 
-### `npm start`
+# 🖥️ 개발 환경
+- React
+- JavaScript
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# ⚙️페이지 구성과 주요 기능
+- 메인 페이지
+  - 로그인 기능
+- 회원가입 페이지
+- 파일 업로드 페이지
+  - 시계열 데이터 파일(csv) 업로드
+- 내 정보 페이지(마이페이지)
+  - 회원가입 시 작성한 정보 조회 및 수정
+- 데이터 분석 페이지
+  - 특정 일자의 데이터에 대해 분석 결과 생성 요청 및 결과 확인
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# 프로젝트 실행 방법
+$ npm install
+$ npm start
+빌드는 $ npm run build
 
-### `npm test`
+# 프로젝트 주의사항
+백엔드 코드는 백엔드 리포지토리에서 따로 관리되며, localhost 환경이 아닌 AWS 인스턴스 환경을 기준으로 프로젝트를 진행하였으니 코드 동작 시 주의하시기 바랍니다.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-=======
-# graduate-demo
-졸작 프젝 데모버전
->>>>>>> 585678718a2f4804187d4fc7c22366b7c96cf6c6
+---
+contanct us: 팀장 이소영 soo7132@naver.com
