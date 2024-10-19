@@ -1,105 +1,65 @@
 import React, {useEffect, useState} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import styled from 'styled-components';
 import Button from '../ui/Button';
-import data from '../../data.json';
 import TextInput from '../ui/TextInput';
-import icon from '../../wdam.png'
-
-const Wrapper = styled.div`
-    padding: 16px;
-    width: calc(100% - 32px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    //background-color: #f7f7f7;
-`;
-
-const Container = styled.div`
-    width: 100%;
-    max-width: 720px;
-
-    :not(:last-child) {
-        margin-bottom: 16px;
-    }
-    
-    //box-shadow: 0 4px 8px rgba(0,0,0,0.1); // 그림자 추가
-    padding: 24px;
-    border-radius: 8px; // 테두리 둥글게
-    //background-color: #fff; // 배경색 변경
-    margin-bottom: 24px; // 마진 변경
-`;
-
-const StyledButtonContainer = styled.div`
-  display: flex; // Flexbox 레이아웃 사용
-  justify-content: center; // 자식 요소들을 수평 중앙으로 정렬
-  gap: 16px; // 버튼 사이에 간격 추가
-  margin-top: 20px; // 상단 여백 추가
-  min-width: 120px;
-  padding: 10px 20px;
-`;
-
-const InputsContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-`;
-
-const Container2 = styled.div`
-    width: 100%;
-    max-width: 720px;
-    display: flex; // Flex 컨테이너로 만듭니다
-    justify-content: center; // 수평 중앙 정렬
-    align-items: center; // 수직 중앙 정렬
-    //padding: 24px;
-    border-radius: 8px;
-    margin-top: 40px;
-`;
+import icon from '../../wdam_modify.png'
+import {
+    Wrapper,
+    Container,
+    Container2,
+    StyledButtonContainer,
+    InputsContainer
+} from '../style/StyleComponent';
 
 
 
 function MainPage(props) {
     const navigate = useNavigate();
-    const [userId, setUserId] = useState('');
-    const [password, setPassword] = useState('');
-    const idx = localStorage.getItem('Idx');
-    const [pwVb, setPwVb] = useState(false);
+    const [userId, setUserId] = useState(''); // 아이디
+    const [password, setPassword] = useState(''); // 비밀번호
+    const [pwVb, setPwVb] = useState(false); // 비밀번호 암호화 on/off
 
     useEffect(() => {
-        const IdCheck = localStorage.getItem('userId');
+        const IdCheck = localStorage.getItem('headerData'); // accessToken 전역변수로 저장
         if (IdCheck) {
-            navigate('/fileupload');
+            //navigate('/fileupload');
         }
 
-    },[navigate])
+    },[navigate]) // navigate 작동 시
 
     const login = async() => {
         try {
-            const response = await fetch('http://localhost:8080/api/user/login', {
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/login', { // 로그인 api
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json', // json 형태로 request parameter 전달
                 },
+                credentials: 'include',
                 body: JSON.stringify({
-                    username: userId,
-                    password: password
+                    userName: userId, // 아이디
+                    password: password // 비밀번호
                 })
             });
-            console.log(response);
-            const data = await response.json();
+            
+            const responseData = await response.json(); // response json 형태로 받기
 
-                // 서버 응답에 따른 처리
-                if (response.ok) {
-                    // 회원가입 성공
-                    localStorage.setItem('Idx', data.id);
-                    localStorage.setItem('userId', userId);
-                    alert("로그인 되었습니다.");
-                    navigate('/fileupload');
-                } else {
-                    // 회원가입 실패
-                    alert("아이디 또는 비밀번호가 일치하지 않습니다.");
-                }
+            // 서버 응답에 따른 처리
+            if (response.ok && responseData.code === "1000") {
+                // 바디와 Authorization 저장                
+                const headerData = response.headers.get('Authorization');
+                const accessToken = responseData.data.accessToken;
+                // const refreshToken = responseData.data.refreshToken;
+                
+                // 로컬 스토리지 (전역 변수)에 저장
+                localStorage.setItem('headerData', JSON.stringify(headerData));
+                localStorage.setItem('accessToken', JSON.stringify(accessToken));
+                // localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+
+                navigate('/fileupload'); // 파일 업로드 페이지로 이동
+            } else {
+                // 로그인 실패
+                alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+            }
         }
         catch (error) {
             console.error('서버 에러:', error);

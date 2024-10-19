@@ -2,83 +2,74 @@ import React, {useEffect, useState} from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../ui/Button';
-import data from '../../data.json';
 import TextInput from '../ui/TextInput';
-import icon from '../../wdam.png'
+import icon from '../../wdam_modify.png'
+import {
+    Wrapper,
+    Container,
+    Container2,
+    StyledButtonContainer,
+    InputsContainer,
+    ButtonContainer
+} from '../style/StyleComponent';
 
-const Wrapper = styled.div`
-    padding: 16px;
-    width: calc(100% - 32px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-`;
-
-const Container = styled.div`
-   width: 100%;
-    max-width: 720px;
-
-    :not(:last-child) {
-        margin-bottom: 16px;
-    }
-    
-    //box-shadow: 0 4px 8px rgba(0,0,0,0.1); // 그림자 추가
-    padding: 24px;
-    border-radius: 8px; // 테두리 둥글게
-    //background-color: #fff; // 배경색 변경
-    margin-bottom: 24px; // 마진 변경
-`;
-
-const Container2 = styled.div`
-    width: 100%;
-    max-width: 720px;
-    display: flex; // Flex 컨테이너로 만듭니다
-    justify-content: center; // 수평 중앙 정렬
-    align-items: center; // 수직 중앙 정렬
-    //padding: 24px;
-    border-radius: 8px;
-    margin-top: 40px;
-`;
-
-const InputsContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-`;
-
-
-const StyledButtonContainer = styled.div`
-  display: flex; // Flexbox 레이아웃 사용
-  justify-content: center; // 자식 요소들을 수평 중앙으로 정렬
-  gap: 16px; // 버튼 사이에 간격 추가
-  margin-top: 20px; // 상단 여백 추가
-  min-width: 120px;
-  margin-bottom: -20px;
-  padding: 10px 20px;
-`;
-
-const ButtonContainer = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 20px;
-
-`
 
 
 function MyPage(props) {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [nickname, setName] = useState('');
-    const [username, setId] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const passwordCheck = password === nickname;
-    const [pwVb, setPwVb] = useState(false);
+    const navigate = useNavigate(); // 페이지 이동 때 사용
+    const [email, setEmail] = useState(''); // 이메일
+    const [password, setPassword] = useState(''); // 비밀번호
+    const [verifyPwd, setVerifyPwd] = useState(''); // 비밀번호 확인
+    const [username, setName] = useState(''); // 닉네임
+    const [phoneNumber, setPhoneNumber] = useState(''); // 전화번호
+    const passwordCheck = password === verifyPwd; // 비밀번호 확인 시 체크하는 변수 (boolean)
+    const [pwVb, setPwVb] = useState(false); // 비밀번호 암호화
 
     useEffect(() => {
-        if (!localStorage.getItem('userId')) navigate('/');
-    }, [navigate])
+        if (!localStorage.getItem('headerData')) {
+            navigate('/');
+        } else {
+            check();
+        } 
+    }, [])
+
+    const check = async() => {
+        try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users', { // 마이페이지 조회
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json', // json으로 전달
+                    'Authorization': headerData // accessToken
+                }
+            });
+            if (response.ok) {
+                const responseData = await response.json(); // json으로 response 받기
+                console.log(responseData);
+                if (responseData.code === "1000") { // 정상적인 연결
+                    setName(responseData.data.userName);
+                    setPhoneNumber(responseData.data.phone);
+                    setEmail(responseData.data.email); // 이름, 전화번호, 이메일 저장
+                } else {
+                    // 데이터 가져오기 실패
+                    alert("GET 실패");
+                }
+            } else if (response.status === 401) {
+                const retryResult = await retry();
+                if (retryResult) {
+                    check();         // 재시도
+                }
+            } else {
+                // 다른 HTTP status인 경우
+                alert(`GET 실패: ${response.status}`);
+            }
+        }
+        catch (error) {
+            console.error('서버 에러:', error);
+            alert("GET 실패");
+        }
+    }
 
     const handleSubmit = async() => {
         try {
@@ -86,40 +77,45 @@ function MyPage(props) {
                 alert("비밀번호를 확인해주세요.");
                 return;
             }
+
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
             let updatedInfo = {};
-            const idx = localStorage.getItem('Idx');
-            if (password) updatedInfo.password = password;
-            if (phoneNumber) updatedInfo.phoneNumber = phoneNumber;
-            if (email) updatedInfo.email = email;
+            if (password) updatedInfo.password = password; // 비밀번호 수정될 시 
+            else updatedInfo.password = null; // 안될 시
+            updatedInfo.phone = phoneNumber;
+            updatedInfo.email = email;
 
-            if (!updatedInfo) {
-                alert("정보를 입력하세요.");
-                return;
-            }
-            else {
-                console.log(updatedInfo);
-            }
-
-            const response = await fetch(`http://localhost:8080/api/user/update/${idx}`, {
+            const response = await fetch(`http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/update`, { // 유저 정보 업데이트
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': headerData
                 },
                 body: JSON.stringify(updatedInfo)
             });
-            console.log(response);
-            const data = await response.json();
+            // 서버 응답에 따른 처리
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log(responseData);
 
-                // 서버 응답에 따른 처리
-                if (response.ok) {
-                    // 회원가입 성공
+                if(responseData.code === "1000"){
+                    // 정보 수정 성공
+                    setPassword('');
+                    setVerifyPwd('');
                     alert("정보 수정 성공");
-                    localStorage.setItem('userId', '');
-                    navigate('/');
                 } else {
-                    // 회원가입 실패
-                    alert("정보 수정 실패?");
+                    // 정보 수정 실패
+                    alert("정보 수정 실패");
                 }
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    handleSubmit();         // 재시도
+                }
+            } else {
+                // 정보 수정 실패
+                alert(`정보 수정 실패: ${response.status}`);
+            }
         }
         catch (error) {
             console.error('서버 에러:', error);
@@ -127,16 +123,121 @@ function MyPage(props) {
         }
     }
 
+    const logout = async() => {
+        try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/logout', { // 로그아웃
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headerData
+                },
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    // refreshToken: refreshToken
+                })
+            });
+            // 서버 응답에 따른 처리
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log(responseData);
+
+                if(responseData.code === "1000"){
+                    localStorage.setItem('headerData', '');
+                    localStorage.setItem('accessToken', '');
+                    // localStorage.setItem('refreshToken', '');
+                    alert("로그아웃 되었습니다.");
+                    navigate('/');
+                } else {
+                    // 로그아웃 실패
+                    alert("로그아웃 실패");
+                }
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    logout();         // 재시도
+                }
+            } else {
+                // 다른 HTTP status인 경우
+                alert(`로그아웃 실패: ${response.status}`);
+            }
+        }
+        catch (error) {
+            console.error('서버 에러:', error);
+            alert("로그아웃 실패");
+        }
+    }
+
+    const retry = async() => {
+        const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+        // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+        try {
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/reissue', { // 마이페이지 조회
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    // refreshToken: refreshToken
+                })
+            });
+            // 서버 응답에 따른 처리
+            if (response.ok) {
+                const responseData = await response.json();
+                if(responseData.code === "1000"){
+                    // 바디와 Authorization 저장                
+                    const headerData = response.headers.get('Authorization');
+                    const accessToken = responseData.data.accessToken;
+                    // const refreshToken = responseData.data.refreshToken;
+                    
+                    console.log(headerData);
+                    // 로컬 스토리지 (전역 변수)에 저장
+                    localStorage.setItem('headerData', JSON.stringify(headerData));
+                    localStorage.setItem('accessToken', JSON.stringify(accessToken));
+                    // localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+
+                    console.log("토큰발급 완료: ", responseData);
+                    return true;
+                } else {
+                    // 토근재발급 실패
+                    alert("로그아웃됨");
+                    return false;
+                }
+                
+            } else if(response.status === 401){
+                // 토근재발급 실패
+                localStorage.setItem('headerData', '');
+                localStorage.setItem('accessToken', '');
+                // localStorage.setItem('refreshToken', '');
+                alert("로그아웃 되었습니다.");
+                navigate('/');
+                return false;
+            } else {
+                // 다른 HTTP status인 경우
+                alert(`토큰발급 실패: ${response.status}`);
+                return false;
+            }
+        }
+        catch (error) {
+            console.error('토큰발급:', error);
+            alert("로그아웃됨");
+            return false;
+        }
+    }
+
     return (
         <div>
             <ButtonContainer>
-                <Button type="tag" title="로그아웃" onClick={()=> {
-                    localStorage.setItem('userId', '');
-                    navigate('/');
-                }}/>
+                <Button type="tag" title="로그아웃" onClick={logout}/>
             </ButtonContainer>
         <Wrapper>
-            <Link to="/">
+            <Link to="/FileUpload">
                 <Container2>
                     <img src={icon} alt="img" style={{maxWidth: '300px', height: 'auto', pointerEvents: 'all'}}/>
                 </Container2>
@@ -146,10 +247,7 @@ function MyPage(props) {
                 <TextInput 
                     height={60}
                     value={username}
-                    onChange={(event) => {  // 여기를 camelCase로 변경
-                        setId(event.target.value);
-                    }}
-                    placeHolder={localStorage.getItem('userId')}
+                    placeHolder="아이디"
                     disabled={true}  // 여기를 소문자로 변경
                     icon="ID"
                 />
@@ -165,10 +263,10 @@ function MyPage(props) {
                 />
                 <TextInput 
                     height={60}
-                    value={nickname}
+                    value={verifyPwd}
                     type={pwVb ? "text" : "password"}
                     onChange={(event) => {  // 여기를 camelCase로 변경
-                        setName(event.target.value);
+                        setVerifyPwd(event.target.value);
                     }}
                     placeHolder="비밀번호 확인"  // 여기를 소문자로 변경
                     icon="password"
@@ -193,7 +291,7 @@ function MyPage(props) {
                 />
                 </InputsContainer>
                 {!passwordCheck && (
-                    <p style={{textAlign: 'center', color:'red'}}>비밀번호가 다릅니다.</p>
+                    <p style={{textAlign: 'center', color:'red'}}>비밀번호가 일치하지 않습니다.</p>
                 )}
                 {passwordCheck && (
                     <p style={{textAlign: 'center', color:'green'}}>비밀번호가 일치합니다.</p>

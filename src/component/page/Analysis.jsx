@@ -1,54 +1,27 @@
-import React, {useEffect, useRef, useState} from 'react';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
-import styled from 'styled-components';
+import React, {useEffect, useState} from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../ui/Button';
-import data from '../../data.json';
-import TextInput from '../ui/TextInput';
-import icon from '../../wdam.png'
 import Log from '../ui/Log';
 import TextBox from '../ui/TextBox';
-
-const ButtonContainer = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 20px;
-`
-
-const ButtonContainer2 = styled.div`
-  position: absolute;
-  left: 240px; // 사이드바의 너비에 맞춰서 조정
-`
-
-const Container = styled.div`
-    display: flex;
-    margin-left: 220px;
-    margin-top: 20px;
-    position: absolute;
-    //position: relative;
-    
-    padding-left: 20px;
-    width: calc(100% - 240px);
-`
-
-const PropContainer = styled.div`
-    display: flex;
-    justify-content: left;
-    flex-wrap: wrap;
-    gap: 10px; // 버튼 사이의 간격
-    margin-top: 20px; // 버튼 상단 여백
-    margin-left: 220px;
-    padding-left: 20px;
-`
+import Loading from '../content/Loading';
+import {
+    ButtonContainer,
+    ButtonContainer2,
+    PropContainer,
+    ObjectContainer,
+    Container3,
+    ContainerAnalysis,
+    ResultContainer
+} from '../style/StyleComponent';
 
 const Feature = [
     "부대 이동 속도 / 위치 변화",
     "인원/장비 수량 변화",
     "개체 탐지",
     "부대의 전투력",
-    "부대의 행동",
+    "부대 행동",
     "부대의 피해 상황",
     "부대 정보",
-    "부대 상태 및 지원"
 ]
 
 const ExplainFeature = [
@@ -59,58 +32,39 @@ const ExplainFeature = [
     "- 부대의 행동 : 분석 대상이 행하고 있는 동작을 출력한다.",
     "- 부대의 피해 상황 : 분석 대상의 인원, 장비 수량 변화와 피해 상태, 화력을 분석한다.",
     "- 부대 정보 : 모든 부대의 이름, 상태, 구성인원, 장비, 무기를 이름별로 출력한다.",
-    "- 부대 상태 및 지원 : 피해 상태가 Moderate Damaged인 모든 부대의 시뮬레이션 시간, 부대 이름, 화력을 분석한다."
+    // "- 부대 상태 및 지원 : 피해 상태가 Moderate Damaged인 모든 부대의 시뮬레이션 시간, 부대 이름, 화력을 분석한다."
 ]
-
-const TestObject = [ // api로 받아오는 걸로 바꿀 예정
-    "A-1-1중대",
-    "A-1-2중대",
-    "A-2-1중대",
-    "A-2-2중대",
-    "B-1-1중대",
-]
-
-const ObjectContainer = styled.div`
-margin-left: 240px;
-margin-bottom: 200px;
-padding: 20px;
-//margin: 20px;
-border: 1px solid #ccc;
-border-radius: 4px;
-background-color: #f8f8f8;
-color: #333;
-font-size: 16px;
-//margin-left: 240px;
-//margin-top: 20px;
-width: calc(50% - 320px);
-`
-
-const Container3 = styled.div`
-    margin-left: 240px;
-    margin-top: -150px;
-    margin-bottom: 100px;
-`
 
 function Analysis(props) {
     let Allunit = false; // 모든 부대를 대상으로 하는지 안하는지 확인
     // useState를 통해서 다른 요소가 바뀌면 재렌더링될때마다 false로 값이 바뀜
+    const location = useLocation();
+    const simulationTimeArray = location.state.uploadedData.data;//[];
     const navigate = useNavigate();
     const [logTime, setLogTime] = useState([]); // 추후에 이 변수를 api로 계속 업데이트
     const [analysisResult, setAnalysisResult] = useState([]);
+    const [unitList, setUnitList] = useState([]);
+    const [loading, setLoading] = useState(false);
     
     const [showSelected, setShowSelected] = useState(true);
-    const selectedTitle = showSelected ? "▼ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요." : "▶ 분석 특성은 무엇입니까? 아래 메뉴에서 선택해주세요.";
+    const selectedTitle = showSelected ? "▼ 분석 특성은 무엇인가요?" : "▶ 분석 특성은 무엇인가요?";
     const [showExplain, setShowExplain] = useState(false);
     const explainTitle = showExplain ? "▼ 설명" : "▶ 설명";
 
     const [chooseExplain, setChooseExplain] = useState(-1);
     const [selectedLog, setSelectedLog] = useState(-1);
     const [selectedFeature, setSelectedFeature] = useState(-1);
-    const [selectedArmyUnit, setSelectedArmyUnit] = useState(-1);
+    const [selectedArmyUnit, setSelectedArmyUnit] = useState(-1); 
 
-    let currentTime = new Date(); // using test 나중에 api 되면 변경 예정
-    const [simulTime, setSimulTime] = useState(''); // using test 나중에 api 되면 변경 예정
-
+    const formatDateTime = (dateTime) => {
+        const date = new Date(dateTime);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}시 ${minutes}분`;
+    };
 
     const handleSelectedClick = () => {
         setShowSelected(!showSelected);
@@ -124,29 +78,160 @@ function Analysis(props) {
 
     const renderObject = () => {
         if (selectedFeature === 6 || selectedFeature === 7) {
-            Allunit = true;
+            //Allunit = true;
             return <p style={{fontWeight: "bold"}}>모든 부대를 대상으로 하는 특성입니다.</p>
         }
-        return TestObject.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
-            <Button type="armyunit" isSelected={selectedArmyUnit === index} title={TestObject[index]} 
+        return unitList.length > 0 ? (
+            unitList.map((obj, index) => ( // 추후에 api로 해당 TestObject를 받아옴
+            <Button type="armyunit" isSelected={selectedArmyUnit === index} title={unitList[index]} 
             key={index} onClick={()=>{setSelectedArmyUnit(index)}}/>
         ))
+        )
+        : (<p>No Units</p>);
+    }
+
+    const renderResult = () => {
+        return analysisResult.length > 0 ? (
+            analysisResult.map((result, index) => (
+            <ResultContainer key={index}>
+                <p style={{fontWeight: "bold"}}>분석 특성: "{result.analysisFeature}"</p>
+                <p>분석 대상 : {result.unitName}</p>
+                <p dangerouslySetInnerHTML={{__html: result.result}}></p>
+                {(result.analysisFeature == '부대 이동 속도 / 위치 변화' || result.analysisFeature == '부대의 피해 상황') && result.imgUrl !== null && <img src={result.imgUrl} alt="img" />}
+                <p>분석 날짜 : {formatDateTime(result.createdAt)}</p>
+            </ResultContainer>
+        )))
+        : (<p>No Result</p>);
+    }
+
+    const moveToTop = () => {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+    const moveToBottom = () => {
+        window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth'});
     }
 
     useEffect(() => {
-        if (!localStorage.getItem('userId')) navigate('/');
+        if (!localStorage.getItem('headerData')) navigate('/');
         if (selectedFeature === 6 || selectedFeature === 7) {
             
         }
-    }, [navigate, selectedFeature])
+        if (simulationTimeArray.length === 0) {
+            fetchUploadedData();
+        } else {
+            setLogTime(simulationTimeArray);
+        }
+    }, [navigate, simulationTimeArray])
+
+    useEffect(() => {
+        if (location.state && location.state.uploadedData.data) {
+            // simulationTimeArray의 첫 번째 값을 simulTime 상태로 설정
+            setLogTime(simulationTimeArray);
+        }
+    }, [location.state]);
+
+    useEffect(() => {
+        if (logTime.length > 0 && selectedLog === -1) {
+            setSelectedLog(0);
+        }
+    }, [logTime]);
+
+    useEffect(() => {
+        if (selectedLog !== -1) {
+            getUnitList();
+        }
+    }, [selectedLog])
+    
+    useEffect(() => {
+        if (selectedFeature === 6 || selectedFeature === 7) {
+            setSelectedArmyUnit(-2);
+        } else {
+            setSelectedArmyUnit(-1);
+        }
+    }, [selectedFeature]);
+
+    useEffect(() => {
+        console.log(analysisResult);
+    })
+
+    const fetchUploadedData = async () => {
+        // Function to re-fetch the uploaded data if simulationTimeArray is empty
+        try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            
+            const formData = new FormData();
+            formData.append('accessToken', accessToken);
+            // formData.append('refreshToken', refreshToken);
+
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/files', {
+                method: 'POST',
+                headers: {
+                    'Authorization': headerData 
+                },
+                body: formData
+            });
+            
+            
+            if (response.ok) {
+                const data = await response.json();
+                setLogTime(data.data);
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    fetchUploadedData();         // 재시도
+                }
+            } else {
+                console.error(`Failed to re-fetch uploaded data: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error re-fetching uploaded data:', error);
+        }
+    }
+
+    
+    
+    const getUnitList = async () => {
+        try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const lgtime = logTime[selectedLog]; // '2024-01-23T13:45:26' 같은 형식이어야 함
+            const response = await fetch(`http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/log/${lgtime}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headerData
+                }
+            });
+    
+            const responseData = await response.json();
+
+            if (response.ok) {
+                // const data = await response.json();
+                setUnitList(responseData.data.unitList);
+                setAnalysisResult(responseData.data.logResults);
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    getUnitList();         // 재시도
+                }
+            }
+            else {
+                console.error(`Failed to fetch logs: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+        }
+    }
 
 
     const LogList = () => {
         return logTime.map((log, index) => (
-            <Button type="log" isSelected={selectedLog === index} title={log} key={index} onClick={()=>
-            {setSelectedLog(index)
-            setSimulTime(log)}} /> // using test
-        ));
+            <Button type="log" isSelected={selectedLog === index} title={formatDateTime(log)} key={index} onClick={()=>
+            {setSelectedLog(index)}} />
+        ))
     }
     const ExplainList = () => {
         return Feature.map((feat, index) => (
@@ -157,79 +242,288 @@ function Analysis(props) {
     }
 
     const submitAnalysis = async() => {
+        if (loading) return;
+        setLoading(true);
         try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+            ///////////////////////////////////////////////////
+            // const formData = new FormData();
+            // formData.append('accessToken', accessToken);
+            // formData.append('refreshToken', refreshToken);
+            // formData.append('characteristics', Feature[selectedFeature]);
+            ///////////////////////////////////////////////////
+
+            // if (selectedFeature === 6 || selectedFeature === 7) {
+            //     formData.append('unit', null);
+            //     selectedArmyUnit = -2;
+            // } else {
+            //     formData.append('unit', unitList[selectedArmyUnit]);
+            // }
+            // formData.append('logCreated', logTime[selectedLog]);
+
+            ///////////////////////////////////////////
+            
             if (selectedLog === -1 || selectedFeature === -1 || selectedArmyUnit === -1) {
                 alert("시뮬레이션 날짜, 분석 특성, 분석 대상을 확인해주세요.")
+                setLoading(false);
                 return;
             }
-            const response = await fetch('http://localhost:8080/api/analyze', {
+            const unit = (selectedFeature === 6 || selectedFeature === 7) ? null : unitList[selectedArmyUnit];
+        
+            console.log(accessToken);
+            // console.log(refreshToken);
+            console.log(headerData);
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/analyze', { // api 300
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': headerData
                 },
+                // body: formData
                 body: JSON.stringify({
-                    trait: Feature[selectedFeature],
-                    unit: TestObject[selectedArmyUnit],
-                    // logtime: logTime[selectedLog]
+                    accessToken: accessToken,
+                    // refreshToken: refreshToken,
+                    characteristics: Feature[selectedFeature],
+                    logCreated: logTime[selectedLog],
+                    unit: unit
                 })
             });
-
-            const data = await response.json();
-
+            const responseData = await response.json();
             if (response.ok) {
-                const response2 = await fetch('http://localhost:8080/api/analyze/result', {
-                method: 'GET',
-                headers: {
-                    'Accept' : 'application/json', 
+                await fetchAnalysisResult();
+            } else if (response.status === 401) {
+                const retryResult = await retry();
+                if (retryResult) {
+                    await submitAnalysis(); // 재시도
+                } else {
+                    setLoading(false);
                 }
-                });
-
-                if (response2.ok) {
-                    const analysisData = await response2.json();
-                    setAnalysisResult(...analysisResult, analysisData);
-                }
-                else {
-                    console.error('분석 결과 가져오기 실패');
-                }
-            }
-            else {
-                console.error('분석 업로드 실패:', data);
+            } else if (responseData.code === "300") {
+                alert("잘못된 분석 특성을 입력받았습니다.")
+                setLoading(false);
+            } else if (responseData.code === "400") {
+                alert("해당 유저를 찾을 수 없습니다.")
+                setLoading(false);
+            } else if (responseData.code === "401") {
+                alert("해당 분석 결과를 찾을 수 없습니다.")
+                setLoading(false);
+            } else if (responseData.code === "402") {
+                alert("해당 unit_list가 없습니다.")
+                setLoading(false);
+            } else if (responseData.code === "403") {
+                alert("해당 unit_behavior가 없습니다.")
+                setLoading(false);
+            } else if (responseData.code === "404") {
+                alert("해당 event가 없습니다.")
+                setLoading(false);
+            } else if (responseData.code === "405") {
+                alert("해당 unit_init이 없습니다.")
+                setLoading(false);
+            } else if (responseData.code === "406") {
+                alert("해당 unit_attributes가 없습니다.")
+                setLoading(false);
+            } else if (responseData.code === "407") {
+                alert("해당 upper_attributes가 없습니다.")
+                setLoading(false);
+            } else if (responseData.code === "500" || responseData.code == "501") {
+                alert("openAi에서 전처리된 데이터 결과를 반환하지 못했습니다.")
+                setLoading(false);
+            } else if (responseData.code === "502") {
+                alert("Data Save Failure")
+                setLoading(false);
+            } else if (responseData.code === "503") {
+                alert("module 실행 중 IOException 등의 문제가 발생했습니다.")
+                setLoading(false);
+            } else {
+                console.error('분석 업로드 실패:', response);
+                setLoading(false);
             }
         }
         catch (error) {
             console.error('서버 에러:', error);
+            setLoading(false);
+        }
+    }
+    
+    const fetchAnalysisResult = async () => {
+        try{
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+
+            const formData = new FormData();
+            formData.append('accessToken', accessToken);
+            // formData.append('refreshToken', refreshToken);
+            formData.append('logCreated', logTime[selectedLog]);
+            const response2 = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/analyze/result', { // api 301
+                method: 'POST',
+                headers: {
+                    'Authorization': headerData
+                },
+                body: formData
+            });
+
+            if (response2.ok) {
+                const data = await response2.json();
+                const analysisData = data.data;
+                console.log("analysisData", analysisData);
+                setAnalysisResult(analysisData);
+                setLoading(false);
+            } else if (response2.status === 401) {
+                const retryResult = await retry();
+                if (retryResult) {
+                    await fetchAnalysisResult(); // 재시도
+                } else {
+                    setLoading(false);
+                }
+            } else {
+                console.error('분석 결과 가져오기 실패');
+                setLoading(false);
+            }
+        } catch (error) {
+            console.error('서버 에러:', error);
+            setLoading(false);
+        }
+    };
+
+
+    const logout = async() => {
+        try {
+            const headerData = JSON.parse(localStorage.getItem('headerData'));
+            const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+            // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headerData
+                },
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    // refreshToken: refreshToken
+                })
+            });
+            const responseData = await response.json();
+            // 서버 응답에 따른 처리
+            if (response.ok) {
+                // const responseData = await response.json();
+                console.log(responseData);
+
+                if(responseData.code === "1000"){
+                    localStorage.setItem('headerData', '');
+                    localStorage.setItem('accessToken', '');
+                    // localStorage.setItem('refreshToken', '');
+                    alert("로그아웃 되었습니다.");
+                    navigate('/');
+                } else {
+                    // 로그아웃 실패
+                    alert("로그아웃 실패");
+                }
+            } else if(response.status === 401){
+                const retryResult = await retry();
+                if (retryResult) {
+                    logout();         // 재시도
+                }
+            } else {
+                // 다른 HTTP status인 경우
+                alert(`로그아웃 실패: ${response.status}`);
+            }
+        }
+        catch (error) {
+            console.error('서버 에러:', error);
+            alert("로그아웃 실패");
         }
     }
 
+    const retry = async() => {
+        const accessToken = JSON.parse(localStorage.getItem('accessToken'));
+        // const refreshToken = JSON.parse(localStorage.getItem('refreshToken'));
+
+        try {
+            const response = await fetch('http://ec2-3-36-242-36.ap-northeast-2.compute.amazonaws.com:8080/users/reissue', { // 마이페이지 조회
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    // refreshToken: refreshToken
+                })
+            });
+            const responseData = await response.json();
+            // 서버 응답에 따른 처리
+            if (response.ok) {
+                // const responseData = await response.json();
+
+                if(responseData.code === "1000"){
+                    // 바디와 Authorization 저장                
+                    const headerData = response.headers.get('Authorization');
+                    const accessToken = responseData.data.accessToken;
+                    // const refreshToken = responseData.data.refreshToken;
+                    
+                    console.log(headerData);
+                    // 로컬 스토리지 (전역 변수)에 저장
+                    localStorage.setItem('headerData', JSON.stringify(headerData));
+                    localStorage.setItem('accessToken', JSON.stringify(accessToken));
+                    // localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+
+                    console.log("토큰발급 완료: ", responseData);
+                    return true;
+                } else {
+                    // 토근재발급 실패
+                    alert("로그아웃됨");
+                    return false;
+                }
+                
+            } else if(response.status === 401){
+                // 토근재발급 실패
+                localStorage.setItem('headerData', '');
+                localStorage.setItem('accessToken', '');
+                // localStorage.setItem('refreshToken', '');
+                alert("로그아웃 되었습니다.");
+                navigate('/');
+                return false;
+            } else {
+                // 다른 HTTP status인 경우
+                alert(`토큰발급 실패: ${response.status}`);
+                return false;
+            }
+        }
+        catch (error) {
+            console.error('토큰발급:', error);
+            alert("로그아웃됨");
+            return false;
+        }
+    }
 
     return (
     <div>
+        {loading ? <Loading></Loading> : null}
         <div style={{position: "fixed", width: "200px", height: "100%", 
         backgroundColor: "#F0F0F0", color: "black",
-        fontSize: "17px", overflowY: "auto"}}><div style={{padding: "15px", textAlign: "center", fontWeight: "Bold", 
-        marginBottom: "20px"}}>분석 로그</div><Log />{LogList()}</div>
+        fontSize: "17px"}}><div style={{padding: "15px", textAlign: "left", fontWeight: "Bold", 
+        marginBottom: "20px"}}>분석 내역</div><Log />{LogList()}</div>
         <ButtonContainer>
             <ButtonContainer2>{renderContent()}</ButtonContainer2>
-            <Button type="tag" title="로그아웃" onClick={()=> {
-                localStorage.setItem('userId', '');
-                navigate('/');
-            }}/>
+            <Button type="tag" title="로그아웃" onClick={logout}/>
             <p style={{fontSize: "15px", color: '#808080', marginLeft: '-12px', marginRight: '-12px'}}>|</p>
             <Button type="tag" title={"마이페이지"} onClick={()=> {
                 navigate('/mypage');
             }}/>
-            <Button title="test" type="tag" onClick={()=> {
-                setLogTime(logTime => [...logTime, 
-                    `${currentTime.getHours()}:${currentTime.getMinutes()}:${currentTime.getSeconds()}`]) // using test
-            }}/>
         </ButtonContainer>
-        <Container>
-            <Button type="square" title={`파일 업로드 시간 : ${simulTime}`} />
-            {/* api로 시간 가져와야함 */}
-        </Container>
+        
+        <ContainerAnalysis>
+            <span style={{fontSize: "16px"}}>어느 시뮬레이션의 데이터를 분석하나요?</span>
+            <Button type="square" title={`시뮬레이션 시간 : ${formatDateTime(logTime[selectedLog])}`} />
+        </ContainerAnalysis>
         <div style={{overflowY: "auto"}}>
         
-        <p style={{marginLeft: '240px', marginTop: '120px', cursor: 'pointer'}} onClick={handleSelectedClick}>{selectedTitle}</p>
+        <p style={{marginLeft: '240px', marginTop: '140px', cursor: 'pointer'}} onClick={handleSelectedClick}>{selectedTitle}</p>
         {showSelected && (
             <>
                 <PropContainer>
@@ -241,7 +535,7 @@ function Analysis(props) {
                 setShowExplain={setShowExplain}
                 text={ExplainFeature}
                 />
-                <p style={{marginLeft: '240px', marginTop: '120px'}}>분석대상을 선택해주세요.</p>
+                <p style={{marginLeft: '240px', marginTop: '120px'}}>분석하려는 대상은 무엇인가요?</p>
                 <ObjectContainer>
                     {renderObject()}
                 </ObjectContainer>
@@ -249,19 +543,16 @@ function Analysis(props) {
             </>
         )}
         
-        <p style={{marginLeft: '240px'}}>{`${logTime[selectedLog]}
-         ${Feature[selectedFeature]} ${Allunit ? 'All' : TestObject[selectedArmyUnit]}`}</p>
-        {/* 테스트용 문구 (api 연결 시 지워야함) */}
-        
-        <p style={{marginLeft: '240px', marginTop: '0px'}}>분석 결과</p>
+        <p style={{marginLeft: '240px', marginTop: '0px', fontWeight: 'bold'}}>분석 결과</p>
         {/*밑의 TextBox에 모듈의 분석 결과를 출력해줌. 그리고 그에 맞는 분석 특성과 대상을 같이 보여줘야함. */}
-        {/* <TextBox
-        title={Feature[selectedFeature]}
-        showExplain={showExplain}
-        setShowExplain={setShowExplain}
-        text={chooseExplain >= 0 ? ExplainFeature[chooseExplain] : ""}
-        /> */}
         
+        {renderResult()}
+        <div style={{position: 'fixed', bottom: '30px', right: '40px', display: 'flex', flexDirection: 'column', border: '1px solid #d1d1d1', borderRadius: '10px', overflow: 'hidden'}}>
+        <button style={{width: "40px", height: "40px", zIndex: '1000', cursor: 'pointer', border: 'none', borderBottom: '1px solid #cccccc', backgroundColor: 'transparent'}}
+        onClick={moveToTop}>↑</button>
+        <button style={{width: "40px", height: "40px", zIndex: '1000', cursor: 'pointer', border: 'none', backgroundColor: 'transparent'}}
+        onClick={moveToBottom}>↓</button>
+        </div>
         </div>
     </div>
     );
